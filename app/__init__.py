@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 db = SQLAlchemy()
 migrate = Migrate()
-load_dotenv()
+load_dotenv('../.env')
 
 
 def create_app(test_config=None):
