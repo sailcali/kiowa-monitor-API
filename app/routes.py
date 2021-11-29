@@ -5,7 +5,7 @@ from app.models import VenstarTemp
 from datetime import datetime, timedelta
 
 venstar_bp = Blueprint('venstar_bp', __name__, url_prefix='/temps')
-login_bp = Blueprint('venstar_bp', __name__, url_prefix='/')
+login_bp = Blueprint('login_bp', __name__, url_prefix='/')
 
 @login_bp.route("", methods=['GET'])
 def login():
