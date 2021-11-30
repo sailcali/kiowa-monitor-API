@@ -19,3 +19,20 @@ def display_recent_temps():
     for temp in temps:
         data[datetime.strftime(temp.time, '%Y-%b-%d %H:%M')] = [temp.local_temp, temp.remote_temp]
     return make_response(data)
+
+@venstar_bp.route("/<requested_date>", methods=["GET"])
+def display_temps_by_date(requested_date):
+    try:
+        start_date = datetime.strptime(requested_date, '%Y-%m-%d')
+    except ValueError:
+        try:
+            start_date = datetime.strptime(requested_date, '%Y-%b-%d')
+        except ValueError:
+            abort(404)
+    end_time = start_date + timedelta(days=1)
+    temps = VenstarTemp.query.filter(VenstarTemp.time>start_date, VenstarTemp.time<end_time).all()
+    data = {}
+    for temp in temps:
+        data[datetime.strftime(temp.time, '%Y-%b-%d %H:%M')] = [temp.local_temp, temp.remote_temp]
+    return make_response(data)
+    
