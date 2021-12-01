@@ -17,7 +17,7 @@ def display_recent_temps():
     temps = VenstarTemp.query.filter(VenstarTemp.time>start_time).all()
     data = {}
     for temp in temps:
-        data[datetime.strftime(temp.time, '%Y-%b-%d %H:%M')] = [temp.local_temp, temp.remote_temp]
+        data[datetime.strftime(temp.time, '%Y-%b-%d %H:%M')] = [temp.local_temp, temp.pi_temp, temp.remote_temp, temp.humidity]
     return make_response(data)
 
 @venstar_bp.route("/<requested_date>", methods=["GET"])
@@ -33,6 +33,6 @@ def display_temps_by_date(requested_date):
     temps = VenstarTemp.query.filter(VenstarTemp.time>start_date, VenstarTemp.time<end_time).all()
     data = {}
     for temp in temps:
-        data[datetime.strftime(temp.time, '%Y-%b-%d %H:%M')] = [temp.local_temp, temp.remote_temp]
+        data[datetime.strftime(temp.time, '%Y-%b-%d %H:%M')] = [temp.local_temp, temp.pi_temp, temp.remote_temp, temp.humidity]
     return make_response(data)
     
