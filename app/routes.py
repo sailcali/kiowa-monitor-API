@@ -36,13 +36,32 @@ def display_temps_by_date(requested_date):
         data[datetime.strftime(temp.time, '%Y-%b-%d %H:%M')] = [temp.local_temp, temp.pi_temp, temp.remote_temp, temp.humidity]
     return make_response(data)
 
+@venstar_bp.route("/today_api", methods=["GET"])
+def return_temps_for_api():
+    start_date = date.today()
+    start_time = datetime.combine(start_date, datetime.min.time()) 
+
+    temps = VenstarTemp.query.filter(VenstarTemp.time>start_time).all()
+    data = {'data': []}
+    for temp in temps:
+        data['data'].append({'time': datetime.strftime(temp.time, '%Y-%b-%d %H:%M'),
+                     'local_temp': temp.local_temp,
+                     'pi_temp': temp.pi_temp,
+                     'remote_temp': temp.remote_temp,
+                     'humidity': temp.humidity})
+    return make_response(data)
+
 @venstar_bp.route("/today", methods=["GET"])
 def display_temps_from_today():
     start_date = date.today()
     start_time = datetime.combine(start_date, datetime.min.time()) 
 
     temps = VenstarTemp.query.filter(VenstarTemp.time>start_time).all()
-    data = {}
+    data = []
     for temp in temps:
-        data[datetime.strftime(temp.time, '%Y-%b-%d %H:%M')] = [temp.local_temp, temp.pi_temp, temp.remote_temp, temp.humidity]
-    return make_response(data)
+        data.append({'time': datetime.strftime(temp.time, '%Y-%b-%d %H:%M'),
+                     'local_temp': temp.local_temp,
+                     'pi_temp': temp.pi_temp,
+                     'remote_temp': temp.remote_temp,
+                     'humidity': temp.humidity})
+    return jsonify(data)

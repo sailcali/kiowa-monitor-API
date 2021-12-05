@@ -1,4 +1,5 @@
 /migrations
+/templates
 
 .vscode
 .DS_Store
