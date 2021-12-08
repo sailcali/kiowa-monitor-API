@@ -1,0 +1,13 @@
+{
+  "name": "kiowa-monitor",
+  "version": "1.0.0",
+  "description": "Whole home monitoring solution",
+  "main": "js\\index.js",
+  "repository": "none",
+  "author": "Paige",
+  "license": "none",
+  "private": null,
+  "dependencies": {
+    "axios": "^0.24.0"
+  }
+}
