@@ -13,8 +13,15 @@
     </header>
     <nav>
         <ul>
-            <li><a>View Today's Usage</a></li>
-            <li><a>View Usage by Date</a></li>
+            <li><a href='/temps/today'>View Today's Usage</a></li>
+            <li class="dropdown">
+                <button class="dropbtn">View Usage on Date</button>
+                <div class="dropdown-content">
+                    <input id="dateInput" value="2021-12-08"></input>
+                    <a id="dateButton" href='/temps/2021-12-08'>GO</a>
+                </div>
+                  
+            </li>
         </ul>
     </nav>
     <main>
@@ -33,4 +40,5 @@
             <p>Humidity: {{data.humidity}}%</p>
         </section>
     </main>
+    <script src="{{ url_for('static', filename='js/venstar.js') }}"></script>
 </body>
