@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Thermostat Dashboard</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/icons/favicon.ico') }}"/>	
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/venstar.css') }}">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+    <header>
+        <h1>Kiowa Thermostat Dashboard</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a>View Today's Usage</a></li>
+            <li><a>View Usage by Date</a></li>
+        </ul>
+    </nav>
+    <main>
+        <section id="thermostatContainer">
+            <h1>Kiowa Thermostat</h1>
+            <p>Thermostat Status: {{data.mode}}</p>
+            <p>Fan Setting: {{data.fan_setting}}</p>
+            <p>Heat Setting: {{data.heat_temp}}*F</p>
+            <p>Cool Setting: {{data.cool_temp}}*F</p>
+
+        </section>
+        <section id="temperatureContainer">
+            <h1>Kiowa Temperatures</h1>
+            <p>Current Space Temp: {{data.current_temp}}*F</p>
+            <p>Outside Temp: {{data.outside_temp}}*F</p>
+            <p>Humidity: {{data.humidity}}%</p>
+        </section>
+    </main>
+</body>
