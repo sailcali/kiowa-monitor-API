@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, make_response, request, abort, render_template
+from flask import Blueprint, jsonify, make_response, request, abort, render_template, redirect, url_for
 from flask.signals import request_finished
 from app import db
 from app.models import VenstarTemp
@@ -11,6 +11,7 @@ load_dotenv()
 IP = os.environ.get("VENSTAR_IP")
 VENSTAR_INFO_URL = 'http://' + IP + '/query/info'
 VENSTAR_SENSOR_URL = 'http://' + IP + '/query/sensors'
+VENSTAR_CONTROL_URL = 'http://' + IP + '/control'
 
 temps_bp = Blueprint('temps_bp', __name__, url_prefix='/temps')
 venstar_bp = Blueprint('venstar_bp', __name__, url_prefix='/venstar')
@@ -55,10 +56,16 @@ def venstar_dashboard():
             'mode': thermostat_mode, 'fan_setting': fan_setting, 'humidity': recent_data.humidity}
     return render_template('venstar_dashboard.html', data=data)
 
-@venstar_bp.route("", methods=['PUT'])
+@venstar_bp.route("", methods=['POST'])
 def venstar_changes():
-    pass
-    # email = request.form.get('email')
+    params = {
+        'mode': request.form.get('mode'),
+        'fan': request.form.get('fan'),
+        'heattemp': request.form.get('heat_temp'),
+        'cooltemp': request.form.get('cool_temp')
+    }
+    requests.post(VENSTAR_CONTROL_URL, params=params)
+    return redirect(url_for('venstar_bp.venstar_dashboard'))
     # password = request.form.get('password')
     # remember = True if request.form.get('remember') else False
 

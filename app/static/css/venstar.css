@@ -25,7 +25,10 @@ main {
     display: flex;
     flex-direction: row;
 }
-
+.checkboxContainer {
+  display: flex;
+  flex-direction: row;
+}
 #thermostatContainer {
     background-color: aqua;
     gap: 50;

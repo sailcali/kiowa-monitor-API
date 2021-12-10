@@ -26,12 +26,35 @@
     </nav>
     <main>
         <section id="thermostatContainer">
-            <h1>Kiowa Thermostat</h1>
-            <p>Thermostat Status: {{data.mode}}</p>
-            <p>Fan Setting: {{data.fan_setting}}</p>
-            <p>Heat Setting: {{data.heat_temp}}*F</p>
-            <p>Cool Setting: {{data.cool_temp}}*F</p>
+            <form  method="POST" action="/venstar">
+                <h1>Kiowa Thermostat</h1>
+                <p>Thermostat Status: {{data.mode}}</p>
+                <div class="checkboxContainer">
+                    <input type="radio" id='modeoff' name="mode" value="0">
+                    <label for="off">OFF</label><br>
+                    <input type="radio" id="modeheat" name="mode" value="1">
+                    <label for="heat">HEAT</label><br>
+                    <input type="radio" id="modecool" name="mode" value="2">
+                    <label for="cool">COOL</label><br>
+                    <input type="radio" id="modeauto" name="mode" value="3">
+                    <label for="auto">AUTO</label>
+                </div>
+                <p>Fan Setting: {{data.fan_setting}}</p>
+                <div class="checkboxContainer">
+                    <input type="radio" id='fanauto' name="fan" value="0">
+                    <label for="auto">AUTO</label><br>
+                    <input type="radio" id="fanon" name="fan" value="1">
+                    <label for="on">ON</label>
+                </div>
+                <p>Heat Setting: {{data.heat_temp}}*F</p>
+                <div>
+                    <input id='heattemp' name="heat_temp" value={{data.heat_temp}}></input>
+                </div>
+                <p>Cool Setting: {{data.cool_temp}}*F</p>
+                <input id='cooltemp' name="cool_temp" value={{data.cool_temp}}></input>
+                <input type="submit" value="Submit">
 
+            </form>
         </section>
         <section id="temperatureContainer">
             <h1>Kiowa Temperatures</h1>
@@ -40,5 +63,9 @@
             <p>Humidity: {{data.humidity}}%</p>
         </section>
     </main>
+    <script>
+        const data = JSON.parse('{{ data | tojson | safe}}');
+        
+    </script>
     <script src="{{ url_for('static', filename='js/venstar.js') }}"></script>
 </body>
