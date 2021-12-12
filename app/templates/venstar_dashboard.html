@@ -13,9 +13,9 @@
     </header>
     <nav>
         <ul>
-            <li><a href='/temps/today'>View Today's Usage</a></li>
+            <li><a href='/temps/today'>View Today's Temps</a></li>
             <li class="dropdown">
-                <button class="dropbtn">View Usage on Date</button>
+                <button class="dropbtn">View Temps on Date</button>
                 <div class="dropdown-content">
                     <input id="dateInput" value="2021-12-08"></input>
                     <a id="dateButton" href='/temps/2021-12-08'>GO</a>
@@ -27,9 +27,13 @@
     <main>
         <section id="thermostatContainer">
             <form  method="POST" action="/venstar">
-                <h1>Kiowa Thermostat</h1>
-                <p>Thermostat Status: {{data.mode}}</p>
-                <div class="checkboxContainer">
+                <div>
+                    <h1>Kiowa Thermostat</h1>
+                </div>
+                <div>
+                    <p>Thermostat Status: {{data.mode}}</p>
+                </div>
+                <div>
                     <input type="radio" id='modeoff' name="mode" value="0">
                     <label for="off">OFF</label><br>
                     <input type="radio" id="modeheat" name="mode" value="1">
@@ -39,20 +43,31 @@
                     <input type="radio" id="modeauto" name="mode" value="3">
                     <label for="auto">AUTO</label>
                 </div>
-                <p>Fan Setting: {{data.fan_setting}}</p>
+                <div>
+                    <p>Fan Setting: {{data.fan_setting}}</p>
+                </div>
                 <div class="checkboxContainer">
                     <input type="radio" id='fanauto' name="fan" value="0">
                     <label for="auto">AUTO</label><br>
                     <input type="radio" id="fanon" name="fan" value="1">
                     <label for="on">ON</label>
                 </div>
-                <p>Heat Setting: {{data.heat_temp}}*F</p>
+                <div>
+                    <p>Heat Setting: {{data.heat_temp}}*F</p>
+                </div>
                 <div>
                     <input id='heattemp' name="heat_temp" value={{data.heat_temp}}></input>
                 </div>
-                <p>Cool Setting: {{data.cool_temp}}*F</p>
-                <input id='cooltemp' name="cool_temp" value={{data.cool_temp}}></input>
-                <input type="submit" value="Submit">
+                <div>
+                    <p>Cool Setting: {{data.cool_temp}}*F</p>
+                </div>
+                <div>
+                    <input id='cooltemp' name="cool_temp" value={{data.cool_temp}}></input>
+                </div>
+                <div>
+                    <input id="tempSubmit" type="submit" value="Adjust Thermostat"></input>
+                </div>
+                
 
             </form>
         </section>

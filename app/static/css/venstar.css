@@ -23,23 +23,37 @@ nav li a:hover {
   }
 main {
     display: flex;
-    flex-direction: row;
 }
-.checkboxContainer {
-  display: flex;
-  flex-direction: row;
-}
+
 #thermostatContainer {
     background-color: aqua;
-    gap: 50;
     border-radius: 30px;
-    height: 300px;
-    width: 300px;
+    height: 500px;
+    width: 320px;
     margin-left: 50px;
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
+}
+
+#thermostatContainer div {
+  display: flex;
+  justify-content: center;
+  align-items: space-around;
+  margin: 0px 30px;
+}
+
+input {
+  width: 50px;
+  padding: 10px 10px;
+  
+  box-sizing: border-box;
+}
+#tempSubmit {
+  background-color:rgb(8, 2, 61);
+  color: white;
+  margin-top: 15px;
+  width: 200px;
 }
 #temperatureContainer {
     background-color: aqua;
