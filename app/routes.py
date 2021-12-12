@@ -24,7 +24,10 @@ def login():
 @venstar_bp.route("", methods=['GET'])
 def venstar_dashboard():
     """Main dashboard for VENSTAR thermostat. Gathers data from the unit (and database for humidity) and renders the page"""
-    
+    authorized_ip = ['192.168.86.28', '192.168.86.24', '192.168.86.238', '192.168.86.20', '192.168.86.240']
+    if request.remote_addr not in authorized_ip:
+        return abort(404)
+
     # Gather all necessary data
     info_response = requests.get(VENSTAR_INFO_URL)
     info = info_response.json()
