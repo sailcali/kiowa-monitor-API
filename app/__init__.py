@@ -24,8 +24,9 @@ def create_app(test_config=None):
 
     # Import models here for Alembic setup
     from app.models import VenstarTemp
+    from app.models import EnphaseProduction
+    from app.models import LightingStatus
     
-
     db.init_app(app)
     migrate.init_app(app, db)
 

@@ -15,3 +15,10 @@ class EnphaseProduction(db.Model):
     __tablename__ = 'enphase_production'
     time = db.Column(db.DateTime, primary_key=True)
     production = db.Column(db.SmallInteger)
+
+class LightingStatus(db.Model):
+    __tablename__ = 'lighting_status'
+    time = db.Column(db.DateTime, primary_key=True)
+    device = db.Column(db.Text)
+    setting = db.Column(db.Boolean)
+    time_on = db.Column(db.SmallInteger, nullable=True)
