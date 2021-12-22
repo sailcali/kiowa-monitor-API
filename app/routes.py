@@ -24,13 +24,9 @@ def login():
 @venstar_bp.route("", methods=['GET'])
 def venstar_dashboard():
     """Main dashboard for VENSTAR thermostat. Gathers data from the unit (and database for humidity) and renders the page"""
-    authorized_ip = ['192.168.86.28', # Parsec (win)
-                     '192.168.86.29', # Stormie
-                     '192.168.86.238', # Faith Phone
-                     '192.168.86.20', # Black Yoda
-                     '192.168.86.24']  # Work Mac
+    authorized_ip = os.environ.get("IP_ALLOWED")
     if request.remote_addr not in authorized_ip:
-        return abort(404)
+        return make_response('Sorry, your computer is not permitted to view this resource.', 401)
 
     # Gather all necessary data
     info_response = requests.get(VENSTAR_INFO_URL)
