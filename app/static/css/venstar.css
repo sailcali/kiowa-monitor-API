@@ -43,7 +43,7 @@ main {
   margin: 0px 30px;
 }
 
-input {
+main input {
   width: 50px;
   padding: 10px 10px;
   
@@ -103,8 +103,14 @@ input {
   /* Change the background color of the dropdown button when the dropdown content is shown */
   .dropdown:hover .dropbtn {background-color: #3e8e41;}
 
-  #dateButton {
+  #dateButtonTemp {
       color: black;
       font-weight: bold;
       background-color: grey;
   }
+
+  /* #dateButtonUsage {
+    color: black;
+    font-weight: bold;
+    background-color: grey;
+  } */

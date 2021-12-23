@@ -26,15 +26,15 @@ const venstarModeSetting = () => {
 };
 venstarModeSetting();
 const changeDateHref = () => {
-    const dateInput = document.getElementById("dateInput").value;
-    const link = document.getElementById("dateButton");
+    const dateInput = document.getElementById("dateInputTemp").value;
+    const link = document.getElementById("dateButtonTemp");
     console.log(dateInput)
     link.setAttribute('href', "/temps/"+dateInput);
 }
 
 const registerEvents = () => {
     
-    const dateInput = document.getElementById('dateInput');
+    const dateInput = document.getElementById('dateInputTemp');
     dateInput.addEventListener('input', changeDateHref);
   };
   
