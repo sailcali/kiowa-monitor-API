@@ -23,6 +23,7 @@ nav li a:hover {
   }
 main {
     display: flex;
+    flex-flow: row wrap;
 }
 
 .container {
