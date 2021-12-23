@@ -174,8 +174,8 @@ def display_usage_from_today():
     data = {'data': []}
     for i in range(len(temps)):
         if i > 0:
-            last_heat_time = temps[i-1].heat_runtime
-            last_cool_time = temps[i-1].cool_runtime
+            last_heat_time = temps[i+1].heat_runtime
+            last_cool_time = temps[i+1].cool_runtime
         else:
             last_heat_time = 0
             last_cool_time = 0
