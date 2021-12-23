@@ -29,6 +29,7 @@ main {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
   margin-left: 50px;    
   background-color: aqua;
   border-radius: 30px;
@@ -46,28 +47,29 @@ main {
   margin: 0px 30px;
 }
 
+#temperatureContainer {
+  height: 300px;
+  width: 300px;
+}
+
+#usageContainer {
+height: 250px;
+width: 300px;
+}
+
 main input {
   width: 50px;
   padding: 10px 10px;
-  
   box-sizing: border-box;
 }
+
 #tempSubmit {
   background-color:rgb(8, 2, 61);
   color: white;
   margin-top: 15px;
   width: 200px;
 }
-#temperatureContainer {
-    height: 300px;
-    width: 300px;
-    align-items: center;
-}
 
-#usageContainer {
-  height: 250px;
-  width: 300px;
-}
 
 /* Dropdown Button */
 .dropbtn {
