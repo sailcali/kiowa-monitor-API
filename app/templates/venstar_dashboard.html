@@ -32,7 +32,7 @@
         </ul>
     </nav>
     <main>
-        <section id="thermostatContainer">
+        <section id="thermostatContainer" class="container">
             <form  method="POST" action="/venstar">
                 <div>
                     <h1>Kiowa Thermostat</h1>
@@ -78,11 +78,16 @@
 
             </form>
         </section>
-        <section id="temperatureContainer">
+        <section id="temperatureContainer" class="container">
             <h1>Kiowa Temperatures</h1>
             <p>Current Space Temp: {{data.current_temp}}*F</p>
             <p>Outside Temp: {{data.outside_temp}}*F</p>
             <p>Humidity: {{data.humidity}}%</p>
+        </section>
+        <section id="usageContainer" class="container">
+            <h1>Thermostat Use</h1>
+            <p>Heat Time Today: {{data.heat_time}} minutes</p>
+            <p>Cool Time Today: {{data.cool_time}} minutes</p>
         </section>
     </main>
     <script>

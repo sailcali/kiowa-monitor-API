@@ -57,7 +57,8 @@ def venstar_dashboard():
         fan_setting = 'ON'
     data = {'current_temp': info['spacetemp'], 'outside_temp': remote_temp, 
             'heat_temp': int(info['heattemp']), 'cool_temp': int(info['cooltemp']),
-            'mode': thermostat_mode, 'fan_setting': fan_setting, 'humidity': recent_data.humidity}
+            'mode': thermostat_mode, 'fan_setting': fan_setting, 'humidity': recent_data.humidity, 
+            'heat_time': recent_data.heat_time, 'cool_time': recent_data.cool_time}
     return render_template('venstar_dashboard.html', data=data)
 
 @venstar_bp.route("", methods=['POST'])
@@ -150,19 +151,13 @@ def display_temps_from_today():
     temps = VenstarTemp.query.filter(VenstarTemp.time>start_time).order_by(VenstarTemp.time.desc()).all()
     data = {'data': []}
     for i in range(len(temps)):
-        if i > 0:
-            last_heat_time = temps[i-1].heat_runtime
-            last_cool_time = temps[i-1].cool_runtime
-        else:
-            last_heat_time = 0
-            last_cool_time = 0
         data['data'].append({'time': datetime.strftime(temps[i].time, '%Y-%b-%d %H:%M'),
                      'local_temp': temps[i].local_temp,
                      'pi_temp': temps[i].pi_temp,
                      'remote_temp': temps[i].remote_temp,
                      'humidity': temps[i].humidity,
-                     'heat_time': temps[i].heat_runtime - last_heat_time,
-                     'cool_time': temps[i].cool_runtime - last_cool_time})
+                     'heat_time': temps[i].heat_runtime,
+                     'cool_time': temps[i].cool_runtime})
     return render_template('index.html', data=data)
 
 @usage_bp.route("/today", methods=["GET"])

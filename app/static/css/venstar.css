@@ -25,15 +25,18 @@ main {
     display: flex;
 }
 
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-left: 50px;    
+  background-color: aqua;
+  border-radius: 30px;
+}
+
 #thermostatContainer {
-    background-color: aqua;
-    border-radius: 30px;
     height: 500px;
     width: 320px;
-    margin-left: 50px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
 }
 
 #thermostatContainer div {
@@ -56,15 +59,9 @@ main input {
   width: 200px;
 }
 #temperatureContainer {
-    background-color: aqua;
-    border-radius: 30px;
     height: 300px;
     width: 300px;
-    margin-left: 50px;
-    display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: center;
 }
 
 /* Dropdown Button */
