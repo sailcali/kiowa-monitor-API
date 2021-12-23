@@ -90,7 +90,7 @@ def display_temps_by_date(requested_date):
         except ValueError:
             abort(404)
     end_time = start_date + timedelta(days=1)
-    temps = VenstarTemp.query.filter(VenstarTemp.time>start_date, VenstarTemp.time<end_time).all()
+    temps = VenstarTemp.query.filter(VenstarTemp.time>start_date, VenstarTemp.time<end_time).order_by(VenstarTemp.time.desc()).all()
     data = {'data': []}
     if start_date < datetime.strptime('2021-12-05', '%Y-%m-%d'):
         for i in range(len(temps)):
@@ -122,7 +122,7 @@ def return_temps_for_api():
     start_date = date.today()
     start_time = datetime.combine(start_date, datetime.min.time())
 
-    temps = VenstarTemp.query.filter(VenstarTemp.time>start_time).all()
+    temps = VenstarTemp.query.filter(VenstarTemp.time>start_time).order_by(VenstarTemp.time.desc()).all()
     data = {'data': []}
     for i in range(len(temps)):
         if i > 0:
@@ -147,7 +147,7 @@ def display_temps_from_today():
     start_date = date.today()
     start_time = datetime.combine(start_date, datetime.min.time())
 
-    temps = VenstarTemp.query.filter(VenstarTemp.time>start_time).all()
+    temps = VenstarTemp.query.filter(VenstarTemp.time>start_time).order_by(VenstarTemp.time.desc()).all()
     data = {'data': []}
     for i in range(len(temps)):
         if i > 0:
@@ -170,7 +170,7 @@ def display_usage_from_today():
     start_date = date.today()
     start_time = datetime.combine(start_date, datetime.min.time())
 
-    temps = VenstarTemp.query.filter(VenstarTemp.time>start_time).all()
+    temps = VenstarTemp.query.filter(VenstarTemp.time>start_time).order_by(VenstarTemp.time.desc()).all()
     data = {'data': []}
     for i in range(len(temps)):
         if i > 0:
