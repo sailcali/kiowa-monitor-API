@@ -1,5 +1,12 @@
 
 
+header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(37, 37, 37);
+}
+
 /*//////////////////////////////////////////////////////////////////
 [ FONT ]*/
 
