@@ -31,7 +31,8 @@ main {
   flex-direction: column;
   justify-content: center;
   
-  margin-left: 50px;    
+  margin-left: 50px;
+  margin-top: 50px;    
   background-color: aqua;
   border-radius: 30px;
 }
