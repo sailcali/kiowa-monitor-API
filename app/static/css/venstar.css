@@ -29,7 +29,7 @@ main {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
+  
   margin-left: 50px;    
   background-color: aqua;
   border-radius: 30px;
@@ -50,11 +50,13 @@ main {
 #temperatureContainer {
   height: 300px;
   width: 300px;
+  align-items: center;
 }
 
 #usageContainer {
 height: 250px;
 width: 300px;
+align-items: center;
 }
 
 main input {
