@@ -56,7 +56,7 @@ def venstar_dashboard():
     else:
         fan_setting = 'ON'
     data = {'current_temp': info['spacetemp'], 'outside_temp': remote_temp, 
-            'heat_temp': info['heattemp'], 'cool_temp': info['cooltemp'],
+            'heat_temp': int(info['heattemp']), 'cool_temp': int(info['cooltemp']),
             'mode': thermostat_mode, 'fan_setting': fan_setting, 'humidity': recent_data.humidity}
     return render_template('venstar_dashboard.html', data=data)
 
