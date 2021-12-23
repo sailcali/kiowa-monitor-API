@@ -58,7 +58,7 @@ def venstar_dashboard():
     data = {'current_temp': info['spacetemp'], 'outside_temp': remote_temp, 
             'heat_temp': int(info['heattemp']), 'cool_temp': int(info['cooltemp']),
             'mode': thermostat_mode, 'fan_setting': fan_setting, 'humidity': recent_data.humidity, 
-            'heat_time': recent_data.heat_time, 'cool_time': recent_data.cool_time}
+            'heat_time': recent_data.heat_runtime, 'cool_time': recent_data.cool_runtime}
     return render_template('venstar_dashboard.html', data=data)
 
 @venstar_bp.route("", methods=['POST'])
