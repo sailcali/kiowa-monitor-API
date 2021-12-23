@@ -64,6 +64,11 @@ main input {
     align-items: center;
 }
 
+#usageContainer {
+  height: 250px;
+  width: 300px;
+}
+
 /* Dropdown Button */
 .dropbtn {
     background-color: #04AA6D;
