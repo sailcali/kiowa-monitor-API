@@ -173,7 +173,7 @@ def display_usage_from_today():
     temps = VenstarTemp.query.filter(VenstarTemp.time>start_time).order_by(VenstarTemp.time.desc()).all()
     data = {'data': []}
     for i in range(len(temps)):
-        if i > 0:
+        if i != len(temps):
             last_heat_time = temps[i+1].heat_runtime
             last_cool_time = temps[i+1].cool_runtime
         else:
