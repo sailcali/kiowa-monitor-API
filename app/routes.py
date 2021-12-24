@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, make_response, request, abort, render_template, redirect, url_for
 from flask.signals import request_finished
 from app import db
-from app.models import VenstarTemp
+from app.models import LightingStatus, VenstarTemp
 from datetime import datetime, timedelta, date
 import requests
 from dotenv import load_dotenv
@@ -23,8 +23,8 @@ def login():
     return redirect(url_for('venstar_bp.venstar_dashboard'))
 
 @venstar_bp.route("", methods=['GET'])
-def venstar_dashboard():
-    """Main dashboard for VENSTAR thermostat. Gathers data from the unit (and database for humidity) and renders the page"""
+def kiowa_dashboard():
+    """Main dashboard for Kiowa. Gathers data from the VENSTAR thermostat, database for humidity and lighting and renders the page"""
     authorized_ip = os.environ.get("IP_ALLOWED")
     if request.remote_addr not in authorized_ip:
         return make_response('Sorry, your computer is not permitted to view this resource.', 401)
@@ -35,31 +35,27 @@ def venstar_dashboard():
     sensor_response = requests.get(VENSTAR_SENSOR_URL)
     sensors = sensor_response.json()
     recent_data = VenstarTemp.query.order_by(VenstarTemp.time.desc()).first()
+    landscape_state = LightingStatus.query.orderby(LightingStatus.time.desc()).first()
 
     # Gather the outdoor temp
     remote_temp = 'N/A' # set to N/A in case its not found!
     for sensor in sensors['sensors']:
         if sensor['name'] == 'Remote':
             remote_temp = sensor['temp']
-    
+    # Change lighting bool to ON or OFF
+    lighting_bool = {True: 'ON', False: 'OFF'}
     # Change mode data (0,1,2,3) to understandable strings
-    if info['mode'] == 0:
-        thermostat_mode = 'OFF'
-    elif info['mode'] == 1:
-        thermostat_mode = 'HEAT'
-    elif info['mode'] == 2:
-        thermostat_mode = 'COOL'
-    else:
-        thermostat_mode = 'AUTO'
-    if info['fan'] == 0:
-        fan_setting = 'AUTO'
-    else:
-        fan_setting = 'ON'
+    venstar_modes = {0: 'OFF', 1: 'HEAT', 2: 'COOL', 3: 'AUTO'}
+    # Change fan state to ON or AUTO
+    fan_states = {0: 'AUTO', 1: 'ON'}
+
     data = {'current_temp': info['spacetemp'], 'outside_temp': remote_temp, 
             'heat_temp': int(info['heattemp']), 'cool_temp': int(info['cooltemp']),
-            'mode': thermostat_mode, 'fan_setting': fan_setting, 'humidity': recent_data.humidity, 
-            'heat_time': recent_data.heat_runtime, 'cool_time': recent_data.cool_runtime}
-    return render_template('venstar_dashboard.html', data=data)
+            'mode': venstar_modes[info['mode']], 'fan_setting': fan_states[info['fan']], 'humidity': recent_data.humidity, 
+            'heat_time': recent_data.heat_runtime, 'cool_time': recent_data.cool_runtime, 
+            'landscape_state': lighting_bool[landscape_state.setting], 'last_landscape_change': landscape_state.time}
+    
+    return render_template('dashboard.html', data=data)
 
 @venstar_bp.route("", methods=['POST'])
 def venstar_changes():
@@ -70,7 +66,7 @@ def venstar_changes():
         'cooltemp': request.form.get('cool_temp')
     }
     requests.post(VENSTAR_CONTROL_URL, params=params)
-    return redirect(url_for('venstar_bp.venstar_dashboard'))
+    return redirect(url_for('venstar_bp.kiowa_dashboard'))
 
 @temps_bp.route("", methods=['GET'])
 def display_recent_temps():

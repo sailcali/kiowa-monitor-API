@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Thermostat Dashboard</title>
+	<title>Kiowa Dashboard</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/icons/favicon.ico') }}"/>	
-	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/venstar.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dashboard.css') }}">
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
     <header>
-        <h1>Kiowa Thermostat Dashboard</h1>
+        <h1>Kiowa Raspberry Dashboard</h1>
     </header>
     <nav>
         <ul>
@@ -88,6 +88,11 @@
             <h1>Thermostat Use</h1>
             <p>Heat Time Today: {{data.heat_time}} minutes</p>
             <p>Cool Time Today: {{data.cool_time}} minutes</p>
+        </section>
+        <section id="lightingContainer" class="container">
+            <h1>Landscape Lighting Status</h1>
+            <p>Landscape Lighting: {{data.Landscape_state}}</p>
+            <p>At time: {{data.last_landscape_change}}</p>
         </section>
     </main>
     <script>
