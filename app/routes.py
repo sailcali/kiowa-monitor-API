@@ -35,7 +35,7 @@ def kiowa_dashboard():
     sensor_response = requests.get(VENSTAR_SENSOR_URL)
     sensors = sensor_response.json()
     recent_data = VenstarTemp.query.order_by(VenstarTemp.time.desc()).first()
-    landscape_state = LightingStatus.query.orderby(LightingStatus.time.desc()).first()
+    landscape_state = LightingStatus.query.order_by(LightingStatus.time.desc()).first()
 
     # Gather the outdoor temp
     remote_temp = 'N/A' # set to N/A in case its not found!
