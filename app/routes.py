@@ -11,6 +11,7 @@ load_dotenv()
 IP = os.environ.get("VENSTAR_IP")
 VENSTAR_INFO_URL = 'http://' + IP + '/query/info'
 VENSTAR_SENSOR_URL = 'http://' + IP + '/query/sensors'
+VENSTAR_RUNTIMES_URL = 'http://' + IP + '/query/runtimes'
 VENSTAR_CONTROL_URL = 'http://' + IP + '/control'
 
 temps_bp = Blueprint('temps_bp', __name__, url_prefix='/temps')
@@ -20,20 +21,22 @@ login_bp = Blueprint('login_bp', __name__, url_prefix='/')
 
 @login_bp.route("", methods=['GET'])
 def login():
-    return redirect(url_for('venstar_bp.venstar_dashboard'))
+    return redirect(url_for('venstar_bp.kiowa_dashboard'))
 
 @venstar_bp.route("", methods=['GET'])
 def kiowa_dashboard():
     """Main dashboard for Kiowa. Gathers data from the VENSTAR thermostat, database for humidity and lighting and renders the page"""
     authorized_ip = os.environ.get("IP_ALLOWED")
     if request.remote_addr not in authorized_ip:
-        return make_response('Sorry, your computer is not permitted to view this resource.', 401)
+        return make_response(f'Sorry, {request.remote_addr} your computer is not permitted to view this resource.', 401)
 
     # Gather all necessary data
     info_response = requests.get(VENSTAR_INFO_URL)
     info = info_response.json()
     sensor_response = requests.get(VENSTAR_SENSOR_URL)
     sensors = sensor_response.json()
+    runtime_response = requests.get(VENSTAR_RUNTIMES_URL)
+    runtimes = runtime_response.json()
     recent_data = VenstarTemp.query.order_by(VenstarTemp.time.desc()).first()
     landscape_state = LightingStatus.query.order_by(LightingStatus.time.desc()).first()
 
@@ -52,7 +55,7 @@ def kiowa_dashboard():
     data = {'current_temp': info['spacetemp'], 'outside_temp': remote_temp, 
             'heat_temp': int(info['heattemp']), 'cool_temp': int(info['cooltemp']),
             'mode': venstar_modes[info['mode']], 'fan_setting': fan_states[info['fan']], 'humidity': recent_data.humidity, 
-            'heat_time': recent_data.heat_runtime, 'cool_time': recent_data.cool_runtime, 
+            'heat_time': runtimes['runtimes'][-1]['heat1'], 'cool_time': runtimes['runtimes'][-1]['cool1'], 
             'landscape_state': lighting_bool[landscape_state.setting], 'last_landscape_change': landscape_state.time}
     
     return render_template('dashboard.html', data=data)
