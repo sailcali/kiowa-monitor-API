@@ -43,40 +43,38 @@
                 </div>
                 <div>
                     <input type="radio" id='modeoff' name="mode" value="0">
-                    <label for="off">OFF</label><br>
-                    <input type="radio" id="modeheat" name="mode" value="1">
-                    <label for="heat">HEAT</label><br>
-                    <input type="radio" id="modecool" name="mode" value="2">
-                    <label for="cool">COOL</label><br>
+                    <label for="off">OFF</label>
+                    <input class="winter" type="radio" id="modeheat" name="mode" value="1">
+                    <label class="winter" for="heat">HEAT</label>
+                    <input class="summer" type="radio" id="modecool" name="mode" value="2">
+                    <label class="summer" for="cool">COOL</label>
                     <input type="radio" id="modeauto" name="mode" value="3">
                     <label for="auto">AUTO</label>
                 </div>
                 <div>
-                    <p>Fan Setting: {{data.fan_setting}}</p>
+                    <p id='fanText'>Fan Setting: {{data.fan_setting}}</p>
                 </div>
-                <div class="checkboxContainer">
+                <div>
                     <input type="radio" id='fanauto' name="fan" value="0">
                     <label for="auto">AUTO</label><br>
                     <input type="radio" id="fanon" name="fan" value="1">
                     <label for="on">ON</label>
                 </div>
-                <div>
+                <div class="winter">
                     <p>Heat Setting: {{data.heat_temp}}*F</p>
                 </div>
-                <div>
+                <div class="winter">
                     <input id='heattemp' name="heat_temp" value={{data.heat_temp}}></input>
                 </div>
-                <div>
+                <div class="summer">
                     <p>Cool Setting: {{data.cool_temp}}*F</p>
                 </div>
-                <div>
+                <div class="summer">
                     <input id='cooltemp' name="cool_temp" value={{data.cool_temp}}></input>
                 </div>
                 <div>
                     <input id="tempSubmit" type="submit" value="Adjust Thermostat"></input>
                 </div>
-                
-
             </form>
         </section>
         <section id="temperatureContainer" class="container">
@@ -87,8 +85,8 @@
         </section>
         <section id="usageContainer" class="container">
             <h1>Thermostat Use</h1>
-            <p>Heat Time Today: {{data.heat_time}} minutes</p>
-            <p>Cool Time Today: {{data.cool_time}} minutes</p>
+            <p class='winter'>Heat Time Today: {{data.heat_time}} minutes</p>
+            <p class='summer'>Cool Time Today: {{data.cool_time}} minutes</p>
         </section>
         <section id="lightingContainer" class="container">
             <h1>Landscape Lighting Status</h1>
@@ -100,5 +98,5 @@
         const data = JSON.parse('{{ data | tojson | safe}}');
         
     </script>
-    <script src="{{ url_for('static', filename='js/venstar.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 </body>

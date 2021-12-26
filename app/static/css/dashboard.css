@@ -21,27 +21,28 @@ nav li a {
 nav li a:hover {
     background-color: #111;
   }
+
 main {
     display: flex;
     flex-flow: row wrap;
 }
 
+/* Each container in the main */
 .container {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  
-  margin-left: 30px;
-  margin-top: 30px;
-  margin-bottom: 30px;
-  margin-right: 30px;    
+  margin-left: 20px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  margin-right: 20px;    
   background-color: aqua;
   border-radius: 30px;
 }
 
 #thermostatContainer {
-    height: 500px;
-    width: 320px;
+    height: 400px;
+    width: 300px;
 }
 
 #thermostatContainer div {
@@ -58,7 +59,7 @@ main {
 }
 
 #usageContainer {
-height: 250px;
+height: 150px;
 width: 300px;
 align-items: center;
 }
@@ -73,6 +74,7 @@ main input {
   width: 50px;
   padding: 10px 10px;
   box-sizing: border-box;
+  text-align: center;
 }
 
 #tempSubmit {
@@ -81,7 +83,6 @@ main input {
   margin-top: 15px;
   width: 200px;
 }
-
 
 /* Dropdown Button */
 .dropbtn {
