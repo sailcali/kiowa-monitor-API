@@ -9,10 +9,12 @@ import os
 
 load_dotenv()
 IP = os.environ.get("VENSTAR_IP")
+PI_ZERO_IP = os.environ.get("PI_ZERO_IP")
 VENSTAR_INFO_URL = 'http://' + IP + '/query/info'
 VENSTAR_SENSOR_URL = 'http://' + IP + '/query/sensors'
 VENSTAR_RUNTIMES_URL = 'http://' + IP + '/query/runtimes'
 VENSTAR_CONTROL_URL = 'http://' + IP + '/control'
+GARAGE_PI_STATUS_URL = 'http://' + PI_ZERO_IP + '/get-status'
 
 temps_bp = Blueprint('temps_bp', __name__, url_prefix='/temps')
 venstar_bp = Blueprint('venstar_bp', __name__, url_prefix='/venstar')
@@ -40,6 +42,8 @@ def kiowa_dashboard():
     runtimes = runtime_response.json()
     recent_data = VenstarTemp.query.order_by(VenstarTemp.time.desc()).first()
     landscape_state = LightingStatus.query.order_by(LightingStatus.time.desc()).first()
+    garage_response = requests.get(GARAGE_PI_STATUS_URL)
+    garage_status = garage_response.json()
 
     # Gather the outdoor temp
     remote_temp = 'N/A' # set to N/A in case its not found!
@@ -47,17 +51,23 @@ def kiowa_dashboard():
         if sensor['name'] == 'Remote':
             remote_temp = sensor['temp']
     # Change lighting bool to ON or OFF
-    lighting_bool = {True: 'ON', False: 'OFF'}
+    lighting_bool = {1: 'ON', 0: 'OFF'}
     # Change mode data (0,1,2,3) to understandable strings
     venstar_modes = {0: 'OFF', 1: 'HEAT', 2: 'COOL', 3: 'AUTO'}
     # Change fan state to ON or AUTO
     fan_states = {0: 'AUTO', 1: 'ON'}
-
-    data = {'current_temp': info['spacetemp'], 'outside_temp': remote_temp, 
+    # Account for garage temp being null...
+    if garage_status['temperature']:
+        garage_temp = int(garage_status['temperature'])
+    else: 
+        garage_temp = 'UNK'
+    data = {'current_temp': int(info['spacetemp']), 'outside_temp': int(remote_temp), 
             'heat_temp': int(info['heattemp']), 'cool_temp': int(info['cooltemp']),
             'mode': venstar_modes[info['mode']], 'fan_setting': fan_states[info['fan']], 'humidity': recent_data.humidity, 
-            'heat_time': runtimes['runtimes'][-1]['heat1'], 'cool_time': runtimes['runtimes'][-1]['cool1'], 
-            'landscape_state': lighting_bool[landscape_state.setting], 'last_landscape_change': landscape_state.time}
+            'living_room_temp': int(recent_data.pi_temp), 'heat_time': runtimes['runtimes'][-1]['heat1'], 
+            'cool_time': runtimes['runtimes'][-1]['cool1'], 'landscape_state': lighting_bool[garage_status['lighting_state']], 
+            'last_landscape_change': landscape_state.time, 'garage_temp': garage_temp, 
+            'current_landscape_delay': garage_status['current_delay']}
     
     return render_template('dashboard.html', data=data)
 

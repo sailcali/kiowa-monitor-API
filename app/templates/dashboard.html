@@ -39,6 +39,10 @@
                     <h1>Kiowa Thermostat</h1>
                 </div>
                 <div>
+                    <p class='winter'>Heat Time Today: {{data.heat_time}} minutes</p>
+                    <p class='summer'>Cool Time Today: {{data.cool_time}} minutes</p>
+                </div>
+                <div>
                     <p>Thermostat Status: {{data.mode}}</p>
                 </div>
                 <div>
@@ -79,24 +83,37 @@
         </section>
         <section id="temperatureContainer" class="container">
             <h1>Kiowa Temperatures</h1>
-            <p>Current Space Temp: {{data.current_temp}}*F</p>
+            <p>Thermostat Temp: {{data.current_temp}}*F</p>
+            <p>Living Room Temp: {{data.living_room_temp}}*F</p>
+            <p>Garage Temp: {{data.garage_temp}}*F</p>
             <p>Outside Temp: {{data.outside_temp}}*F</p>
-            <p>Humidity: {{data.humidity}}%</p>
+            <p>Living Room Humidity: {{data.humidity}}%</p>
         </section>
-        <section id="usageContainer" class="container">
+        <!-- <section id="usageContainer" class="container">
             <h1>Thermostat Use</h1>
             <p class='winter'>Heat Time Today: {{data.heat_time}} minutes</p>
             <p class='summer'>Cool Time Today: {{data.cool_time}} minutes</p>
-        </section>
+        </section> -->
         <section id="lightingContainer" class="container">
             <h1>Landscape Lighting Status</h1>
             <p>Landscape Lighting: {{data.landscape_state}}</p>
             <p>At time: {{data.last_landscape_change}}</p>
+            <p>Current Delay Set: {{data.current_landscape_delay}}</p>
+            <div id="landscapeDelaySelector">
+                <p>Set new delay (minutes): </p>
+                <input id="delayDateTime"></input>
+                
+            </div>
+            <label class="switch">
+                <input id='landscapeLightSwitch' type="checkbox">
+                <span class="slider round"></span>
+            </label>
         </section>
     </main>
     <script>
         const data = JSON.parse('{{ data | tojson | safe}}');
         
     </script>
-    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script type="module" src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 </body>

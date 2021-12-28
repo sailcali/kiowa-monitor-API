@@ -1,3 +1,4 @@
+
 const venstarModeSetting = () => {
     
     // Check the radio buttons for current HVAC modes
@@ -24,7 +25,11 @@ const venstarModeSetting = () => {
     else if (data.fan_setting === "ON") {
         const radio = document.getElementById('fanon');
         radio.checked = true
-    }
+    };
+    if (data.landscape_state === 'ON') {
+        const slider = document.getElementById("landscapeLightSwitch")
+        slider.checked = true
+    };
 
     // Do not display heat modes in summer / cool modes in winter
     const current_month = new Date().getMonth()
@@ -47,10 +52,43 @@ const changeDateHref = () => {
     console.log(dateInput)
     link.setAttribute('href', "/temps/"+dateInput);
 }
+const adjustLandscapeLighting = () => {
+    const newDelay = document.getElementById("delayDateTime").value
+    var delay = 0
+    if (newDelay != '') {
+        delay = newDelay
+    }
+    if (data.landscape_state === 'ON') {
+        axios.post('http://192.168.86.31/change-state', {
+            state: 0,
+            delay_time: delay
+          })
+          .then(function (response) {
+            console.log(response);
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+        } else {
+            axios.post('http://192.168.86.31/change-state', {
+            state: 1,
+            delay_time: delay
+          })
+          .then(function (response) {
+            console.log(response);
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+        };
+        
+    };
 
 const registerEvents = () => {
     const dateInput = document.getElementById('dateInputTemp');
     dateInput.addEventListener('input', changeDateHref);
+    const lightingSwitch = document.getElementById('landscapeLightSwitch');
+    lightingSwitch.addEventListener('click', adjustLandscapeLighting);
   };
   
   document.addEventListener('DOMContentLoaded', registerEvents);
