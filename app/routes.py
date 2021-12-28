@@ -18,6 +18,7 @@ temps_bp = Blueprint('temps_bp', __name__, url_prefix='/temps')
 venstar_bp = Blueprint('venstar_bp', __name__, url_prefix='/venstar')
 usage_bp = Blueprint('usage_bp', __name__, url_prefix='/usage')
 login_bp = Blueprint('login_bp', __name__, url_prefix='/')
+landscape_bp = Blueprint('landscape_bp', __name__, url_prefix='/landscape')
 
 @login_bp.route("", methods=['GET'])
 def login():
@@ -181,3 +182,15 @@ def display_usage_from_today():
                      'heat_time': temps[i].heat_runtime - last_heat_time,
                      'cool_time': temps[i].cool_runtime - last_cool_time})
     return render_template('hvac-index.html', data=data)
+
+@landscape_bp.route("/update-state", methods=['POST'])
+def change_landscape_state():
+    request_body = request.get_json()
+    last_entry = LightingStatus.query.order_by(LightingStatus.time.desc()).first()
+    new_entry = LightingStatus(time=request_body['time'], device='landscape', setting=request_body['state'])
+    if not request_body['state']:
+        time_on = datetime.strptime(new_entry.time, '%Y-%m-%d %H:%M') - last_entry.time
+        new_entry.time_on = time_on.total_seconds()/60
+    db.session.add(new_entry)
+    db.session.commit()
+    return jsonify(new_entry.time_on), 201
