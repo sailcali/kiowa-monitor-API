@@ -199,7 +199,7 @@ def change_landscape_state():
     last_entry = LightingStatus.query.order_by(LightingStatus.time.desc()).first()
     new_entry = LightingStatus(time=request_body['time'], device='landscape', setting=request_body['state'])
     if not request_body['state']:
-        time_on = datetime.strptime(new_entry.time, '%Y-%m-%d %H:%M') - last_entry.time
+        time_on = datetime.strptime(new_entry.time, '%Y-%m-%d %H:%M:%S') - last_entry.time
         new_entry.time_on = time_on.total_seconds()/60
     db.session.add(new_entry)
     db.session.commit()
