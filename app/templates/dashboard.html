@@ -85,7 +85,7 @@
             <h1>Kiowa Temperatures</h1>
             <p>Thermostat Temp: {{data.current_temp}}*F</p>
             <p>Living Room Temp: {{data.living_room_temp}}*F</p>
-            <p>Garage Temp: {{data.garage_temp}}*F</p>
+            <p id="garageTemperature">Garage Temp: UNK*F</p>
             <p>Outside Temp: {{data.outside_temp}}*F</p>
             <p>Living Room Humidity: {{data.humidity}}%</p>
         </section>
@@ -96,16 +96,19 @@
         </section> -->
         <section id="lightingContainer" class="container">
             <h1>Landscape Lighting Status</h1>
-            <p>Landscape Lighting: {{data.landscape_state}}</p>
+            <p id="landscapeState">Landscape Lighting: {{data.landscape_state}}</p>
             <p>At time: {{data.last_landscape_change}}</p>
-            <p>Current Delay Set: {{data.current_landscape_delay}}</p>
+            <p id="landscapeDelaySetTime">Current Delay Set: No Data</p>
             <div id="landscapeDelaySelector">
                 <p>Set new delay (minutes): </p>
                 <input id="delayDateTime"></input>
                 
             </div>
             <label class="switch">
-                <input id='landscapeLightSwitch' type="checkbox">
+                
+                
+                {% if data.landscape_stat == 'ON'%}<input id='landscapeLightSwitch' type="checkbox">
+                {% else %}<input id='landscapeLightSwitch' type="checkbox" checked>{% endif %}
                 <span class="slider round"></span>
             </label>
         </section>

@@ -42,8 +42,6 @@ def kiowa_dashboard():
     runtimes = runtime_response.json()
     recent_data = VenstarTemp.query.order_by(VenstarTemp.time.desc()).first()
     landscape_state = LightingStatus.query.order_by(LightingStatus.time.desc()).first()
-    garage_response = requests.get(GARAGE_PI_STATUS_URL)
-    garage_status = garage_response.json()
 
     # Gather the outdoor temp
     remote_temp = 'N/A' # set to N/A in case its not found!
@@ -56,18 +54,13 @@ def kiowa_dashboard():
     venstar_modes = {0: 'OFF', 1: 'HEAT', 2: 'COOL', 3: 'AUTO'}
     # Change fan state to ON or AUTO
     fan_states = {0: 'AUTO', 1: 'ON'}
-    # Account for garage temp being null...
-    if garage_status['temperature']:
-        garage_temp = int(garage_status['temperature'])
-    else: 
-        garage_temp = 'UNK'
+
     data = {'current_temp': int(info['spacetemp']), 'outside_temp': int(remote_temp), 
             'heat_temp': int(info['heattemp']), 'cool_temp': int(info['cooltemp']),
             'mode': venstar_modes[info['mode']], 'fan_setting': fan_states[info['fan']], 'humidity': recent_data.humidity, 
             'living_room_temp': int(recent_data.pi_temp), 'heat_time': runtimes['runtimes'][-1]['heat1'], 
-            'cool_time': runtimes['runtimes'][-1]['cool1'], 'landscape_state': lighting_bool[garage_status['lighting_state']], 
-            'last_landscape_change': landscape_state.time, 'garage_temp': garage_temp, 
-            'current_landscape_delay': garage_status['current_delay']}
+            'cool_time': runtimes['runtimes'][-1]['cool1'], 'landscape_state': lighting_bool[landscape_state.setting], 
+            'last_landscape_change': landscape_state.time}
     
     return render_template('dashboard.html', data=data)
 

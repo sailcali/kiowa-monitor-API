@@ -53,10 +53,10 @@ const changeDateHref = () => {
     link.setAttribute('href', "/temps/"+dateInput);
 }
 const adjustLandscapeLighting = () => {
-    const newDelay = document.getElementById("delayDateTime").value
+    const newDelay = document.getElementById("delayDateTime")
     var delay = 0
-    if (newDelay != '') {
-        delay = newDelay
+    if (newDelay.value != '') {
+        delay = newDelay.value
     }
     if (data.landscape_state === 'ON') {
         axios.post('http://192.168.86.31/change-state', {
@@ -64,10 +64,12 @@ const adjustLandscapeLighting = () => {
             delay_time: delay
           })
           .then(function (response) {
-            console.log(response);
+            location.reload()
           })
           .catch(function (error) {
             console.log(error);
+            lightingSwitch.checked = true;
+
           });
         } else {
             axios.post('http://192.168.86.31/change-state', {
@@ -75,21 +77,45 @@ const adjustLandscapeLighting = () => {
             delay_time: delay
           })
           .then(function (response) {
-            console.log(response);
+            location.reload()
           })
           .catch(function (error) {
             console.log(error);
+            lightingSwitch.checked = false;
           });
         };
         
     };
 
+const getGarageData = () => {
+    axios.get('http://192.168.86.31/get-status')
+    .then((response) => {
+        console.log(response.data)
+        const garageTempElement = document.getElementById("garageTemperature");
+        const landscapeStateElement = document.getElementById("landscapeState");
+        const landscapeDelayElement = document.getElementById("landscapeDelaySetTime");
+        const slider = document.getElementById("landscapeLightSwitch");
+        garageTempElement.innerHTML = "Garage Temp: " + parseInt(response.data['temperature']) + "*F";
+        landscapeDelayElement.innerHTML = "Current Delay Set: " + response.data['current_delay'];
+        if (response.data['lighting_state'] == 1) {
+            landscapeStateElement.innerHTML = "Landscape Lighting: ON"
+            slider.checked = true
+        } else {
+            landscapeStateElement.innerHTML = "Landscape Lighting: OFF"
+            slider.checked = false
+        }
+        
+    })
+}
+
 const registerEvents = () => {
+    getGarageData();
     const dateInput = document.getElementById('dateInputTemp');
     dateInput.addEventListener('input', changeDateHref);
     const lightingSwitch = document.getElementById('landscapeLightSwitch');
     lightingSwitch.addEventListener('click', adjustLandscapeLighting);
-  };
+  
+};
   
   document.addEventListener('DOMContentLoaded', registerEvents);
   
