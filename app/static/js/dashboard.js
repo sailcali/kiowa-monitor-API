@@ -44,7 +44,6 @@ const venstarModeSetting = () => {
     };
     
 };
-venstarModeSetting();
 
 const changeDateHref = () => {
     const dateInput = document.getElementById("dateInputTemp").value;
@@ -96,7 +95,7 @@ const getGarageData = () => {
         const landscapeDelayElement = document.getElementById("landscapeDelaySetTime");
         const slider = document.getElementById("landscapeLightSwitch");
         garageTempElement.innerHTML = "Garage Temp: " + parseInt(response.data['temperature']) + "*F";
-        landscapeDelayElement.innerHTML = "Current Delay Set: " + response.data['current_delay'];
+        landscapeDelayElement.innerHTML = "Delay Set Time: " + response.data['current_delay'];
         if (response.data['lighting_state'] == 1) {
             landscapeStateElement.innerHTML = "Landscape Lighting: ON"
             slider.checked = true
@@ -109,12 +108,12 @@ const getGarageData = () => {
 }
 
 const registerEvents = () => {
-    getGarageData();
+    venstarModeSetting();
     const dateInput = document.getElementById('dateInputTemp');
     dateInput.addEventListener('input', changeDateHref);
     const lightingSwitch = document.getElementById('landscapeLightSwitch');
     lightingSwitch.addEventListener('click', adjustLandscapeLighting);
-  
+    getGarageData();
 };
   
   document.addEventListener('DOMContentLoaded', registerEvents);

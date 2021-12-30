@@ -7,6 +7,9 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="refresh" content="15">
+    <script>
+        const data = JSON.parse('{{ data | tojson | safe}}');
+    </script>
 </head>
 <body>
     <header>
@@ -85,7 +88,7 @@
             <h1>Kiowa Temperatures</h1>
             <p>Thermostat Temp: {{data.current_temp}}*F</p>
             <p>Living Room Temp: {{data.living_room_temp}}*F</p>
-            <p id="garageTemperature">Garage Temp: UNK*F</p>
+            <p id="garageTemperature">Garage Temp: *F</p>
             <p>Outside Temp: {{data.outside_temp}}*F</p>
             <p>Living Room Humidity: {{data.humidity}}%</p>
         </section>
@@ -98,24 +101,21 @@
             <h1>Landscape Lighting Status</h1>
             <p id="landscapeState">Landscape Lighting: {{data.landscape_state}}</p>
             <p>At time: {{data.last_landscape_change}}</p>
-            <p id="landscapeDelaySetTime">Current Delay Set: No Data</p>
+            <p id="landscapeDelaySetTime">Delay Set Time: No Data</p>
             <div id="landscapeDelaySelector">
                 <p>Set new delay (minutes): </p>
                 <input id="delayDateTime"></input>
                 
             </div>
             <label class="switch">
-                
-                
-                {% if data.landscape_stat == 'ON'%}<input id='landscapeLightSwitch' type="checkbox">
-                {% else %}<input id='landscapeLightSwitch' type="checkbox" checked>{% endif %}
+                <input id='landscapeLightSwitch' type="checkbox">
                 <span class="slider round"></span>
             </label>
         </section>
     </main>
     <script>
         const data = JSON.parse('{{ data | tojson | safe}}');
-        
+
     </script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script type="module" src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
