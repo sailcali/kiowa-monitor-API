@@ -153,7 +153,7 @@ def return_temps_for_api():
     return response
 
 @temps_bp.route("/current_temps", methods=["GET"])
-def return_temps_for_api():
+def return_current_temps_for_api():
     if dht_import:
         try:
             sensor = dht.DHT22(D4)
