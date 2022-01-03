@@ -6,12 +6,6 @@ from datetime import datetime, timedelta, date
 import requests
 from dotenv import load_dotenv
 import os
-try:
-    import adafruit_dht as dht
-    from board import D4
-    dht_import = True
-except ImportError:
-    dht_import = False
 
 load_dotenv()
 IP = os.environ.get("VENSTAR_IP")
@@ -154,18 +148,12 @@ def return_temps_for_api():
 
 @temps_bp.route("/current_temps", methods=["GET"])
 def return_current_temps_for_api():
-    if dht_import:
-        try:
-            sensor = dht.DHT22(D4)
-            farenheight = sensor.temperature * (9 / 5) + 32
-            hum = sensor.humidity
-            sensor.exit()
-        except Exception:
-            farenheight = None
-            hum = None
-        return jsonify({'temperature': farenheight, 'humidity': hum}), 200
-    else:
-        return jsonify('DHT is not set up'), 500
+    temps = VenstarTemp.query.order_by(VenstarTemp.time.desc()).first()
+    living_room = temps.pi_temp
+    venstar_response = requests.get(VENSTAR_INFO_URL)
+    venstar_info = venstar_response.json()
+    hum = temps.humidity
+    return jsonify({'thermostat_temp': venstar_info['spacetemp'], 'living_room_temp': living_room, 'humidity': hum}), 200
 
 @temps_bp.route("/today", methods=["GET"])
 def display_temps_from_today():
