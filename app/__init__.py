@@ -29,12 +29,13 @@ def create_app(test_config=None):
     migrate.init_app(app, db)
 
     # Register Blueprints here
-    from .routes import temps_bp, venstar_bp, login_bp, usage_bp, landscape_bp
+    from .routes import temps_bp, venstar_bp, login_bp, usage_bp, landscape_bp, api_bp
     app.register_blueprint(temps_bp)
     app.register_blueprint(venstar_bp)
     app.register_blueprint(login_bp)
     app.register_blueprint(usage_bp)
     app.register_blueprint(landscape_bp)
+    app.register_blueprint(api_bp)
     
 
     return app

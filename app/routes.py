@@ -21,10 +21,16 @@ venstar_bp = Blueprint('venstar_bp', __name__, url_prefix='/venstar')
 usage_bp = Blueprint('usage_bp', __name__, url_prefix='/usage')
 login_bp = Blueprint('login_bp', __name__, url_prefix='/')
 landscape_bp = Blueprint('landscape_bp', __name__, url_prefix='/landscape')
+api_bp = Blueprint('api_bp', __name__, url_prefix='/api')
 
 @login_bp.route("", methods=['GET'])
 def login():
     return redirect(url_for('venstar_bp.kiowa_dashboard'))
+
+@api_bp.route("", methods=['GET'])
+def return_api_docs():
+    return jsonify({'temps': 'Returns temperatures from today', 
+                    '/current_temps': 'Returns current temperatures monitored by server'})
 
 @venstar_bp.route("", methods=['GET'])
 def kiowa_dashboard():
@@ -66,6 +72,8 @@ def kiowa_dashboard():
 
 @venstar_bp.route("", methods=['POST'])
 def venstar_changes():
+    """Middle-man for changing VENSTAR status. POST request made from dashboard, 
+    makes post request to VENSTAR control, and re-renders dashboard"""
     params = {
         'mode': request.form.get('mode'),
         'fan': request.form.get('fan'),
@@ -75,17 +83,9 @@ def venstar_changes():
     requests.post(VENSTAR_CONTROL_URL, params=params)
     return redirect(url_for('venstar_bp.kiowa_dashboard'))
 
-@temps_bp.route("", methods=['GET'])
-def display_recent_temps():
-    start_time = datetime.now() - timedelta(days=1)
-    temps = VenstarTemp.query.filter(VenstarTemp.time>start_time).all()
-    data = {}
-    for temp in temps:
-        data[datetime.strftime(temp.time, '%Y-%b-%d %H:%M')] = [temp.local_temp, temp.pi_temp, temp.remote_temp, temp.humidity]
-    return make_response(data)
-
 @temps_bp.route("/<requested_date>", methods=["GET"])
 def display_temps_by_date(requested_date):
+    """Renders a table of temperatures from a given date"""
     try:
         start_date = datetime.strptime(requested_date, '%Y-%m-%d')
     except ValueError:
@@ -121,8 +121,9 @@ def display_temps_by_date(requested_date):
                         'cool_time': temps[i].cool_runtime - last_cool_time})
     return render_template('index.html', data=data)
 
-@temps_bp.route("/today_api", methods=["GET"])
+@api_bp.route("/temps", methods=["GET"])
 def return_temps_for_api():
+    """API call for today's temps"""
     start_date = date.today()
     start_time = datetime.combine(start_date, datetime.min.time())
 
@@ -146,8 +147,9 @@ def return_temps_for_api():
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
 
-@temps_bp.route("/current_temps", methods=["GET"])
+@api_bp.route("/current_temps", methods=["GET"])
 def return_current_temps_for_api():
+    """Returns a JSON of the current temperatures onboard the server"""
     temps = VenstarTemp.query.order_by(VenstarTemp.time.desc()).first()
     living_room = temps.pi_temp
     venstar_response = requests.get(VENSTAR_INFO_URL)
@@ -157,6 +159,7 @@ def return_current_temps_for_api():
 
 @temps_bp.route("/today", methods=["GET"])
 def display_temps_from_today():
+    """Renders a table of today's temperature data"""
     start_date = date.today()
     start_time = datetime.combine(start_date, datetime.min.time())
 
@@ -174,6 +177,7 @@ def display_temps_from_today():
 
 @usage_bp.route("/today", methods=["GET"])
 def display_usage_from_today():
+    """Renders a table of today's usage data"""
     start_date = date.today()
     start_time = datetime.combine(start_date, datetime.min.time())
 
@@ -197,6 +201,9 @@ def display_usage_from_today():
 
 @landscape_bp.route("/update-state", methods=['POST'])
 def change_landscape_state():
+    """Updates database with new lighting state. Requirements: state and time. 
+    state = True or False
+    time = time of event"""
     request_body = request.get_json()
     last_entry = LightingStatus.query.order_by(LightingStatus.time.desc()).first()
     new_entry = LightingStatus(time=request_body['time'], device='landscape', setting=request_body['state'])
