@@ -34,12 +34,12 @@ const venstarModeSetting = () => {
     // Do not display heat modes in summer / cool modes in winter
     const current_month = new Date().getMonth()
     if (current_month > 4 && current_month < 10) {
-        for (let element of document.getElementsByClassName("winter")){
-            element.style.display="none";
+        for (let element of document.getElementsByClassName("summer")){
+            element.style.display="flex";
          }
     } else {
-        for (let element of document.getElementsByClassName("summer")){
-            element.style.display="none";
+        for (let element of document.getElementsByClassName("winter")){
+            element.style.display="flex";
          }
     };
     
@@ -48,7 +48,6 @@ const venstarModeSetting = () => {
 const changeDateHref = () => {
     const dateInput = document.getElementById("dateInputTemp").value;
     const link = document.getElementById("dateButtonTemp");
-    console.log(dateInput)
     link.setAttribute('href', "/temps/"+dateInput);
 }
 const adjustLandscapeLighting = () => {
@@ -89,13 +88,14 @@ const adjustLandscapeLighting = () => {
 const getGarageData = () => {
     axios.get('http://192.168.86.31/get-status')
     .then((response) => {
-        console.log(response.data)
+        const current_date = new Date()
+        const delay_date = new Date(response.data['current_delay'])
         const garageTempElement = document.getElementById("garageTemperature");
         const landscapeStateElement = document.getElementById("landscapeState");
         const landscapeDelayElement = document.getElementById("landscapeDelaySetTime");
         const slider = document.getElementById("landscapeLightSwitch");
         garageTempElement.innerHTML = "Garage Temp: " + parseInt(response.data['temperature']) + "*F";
-        landscapeDelayElement.innerHTML = "Delay Set Time: " + response.data['current_delay'];
+        
         if (response.data['lighting_state'] == 1) {
             landscapeStateElement.innerHTML = "Landscape Lighting: ON"
             slider.checked = true
@@ -103,8 +103,27 @@ const getGarageData = () => {
             landscapeStateElement.innerHTML = "Landscape Lighting: OFF"
             slider.checked = false
         }
+
+        if (delay_date > current_date) {
+            landscapeDelayElement.innerHTML = "Delay Set Time: " + response.data['current_delay'];
+            landscapeDelayElement.style.display="flex";
+        }
         
     })
+}
+
+const adjustSetTemperature = (event) => {
+    const heatElement = document.getElementById('heattemp')
+    const coolElement = document.getElementById('cooltemp')
+    if (event.target.id == 'heatIncrease') {
+        heatElement.value = parseInt(heatElement.value) + 1
+    } else if (event.target.id == 'heatDecrease') {
+        heatElement.value = parseInt(heatElement.value) - 1
+    } else if (event.target.id == 'coolIncrease') {
+        coolElement.value = parseInt(coolElement.value) + 1
+    } else if (event.target.id == 'heatDecrease') {
+        coolElement.value = parseInt(coolElement.value) - 1
+    };
 }
 
 const registerEvents = () => {
@@ -113,6 +132,15 @@ const registerEvents = () => {
     dateInput.addEventListener('input', changeDateHref);
     const lightingSwitch = document.getElementById('landscapeLightSwitch');
     lightingSwitch.addEventListener('click', adjustLandscapeLighting);
+    const heat_increase = document.getElementById('heatIncrease');
+    const heat_decrease = document.getElementById('heatDecrease');
+    const cool_increase = document.getElementById('coolIncrease');
+    const cool_decrease = document.getElementById('coolDecrease');
+    heat_increase.addEventListener('click', adjustSetTemperature);
+    heat_decrease.addEventListener('click', adjustSetTemperature);
+    cool_increase.addEventListener('click', adjustSetTemperature);
+    cool_decrease.addEventListener('click', adjustSetTemperature);
+
     getGarageData();
 };
   

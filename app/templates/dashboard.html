@@ -37,7 +37,7 @@
     </nav>
     <main>
         <section id="thermostatContainer" class="container">
-            <form  method="POST" action="/venstar">
+            <form method="POST" action="/venstar">
                 <div>
                     <h1>Kiowa Thermostat</h1>
                 </div>
@@ -67,17 +67,21 @@
                     <input type="radio" id="fanon" name="fan" value="1">
                     <label for="on">ON</label>
                 </div>
-                <div class="winter">
-                    <p>Heat Setting: {{data.heat_temp}}*F</p>
+                <div>
+                    <p class="winter">Heat Setting:</p>
                 </div>
-                <div class="winter">
-                    <input id='heattemp' name="heat_temp" value={{data.heat_temp}}></input>
+                <div>
+                    <button class="winter roundButton" id="heatDecrease" type="button">~</button>
+                    <input class="winter" id='heattemp' name="heat_temp" value={{data.heat_temp}}></input>
+                    <button class="winter roundButton" id="heatIncrease" type="button">+</button>
                 </div>
-                <div class="summer">
-                    <p>Cool Setting: {{data.cool_temp}}*F</p>
+                <div>
+                    <p class="summer">Cool Setting:</p>
                 </div>
-                <div class="summer">
-                    <input id='cooltemp' name="cool_temp" value={{data.cool_temp}}></input>
+                <div>
+                    <button class="summer roundButton" id="coolDecrease" type="button">-</button>
+                    <input class="summer" id='cooltemp' name="cool_temp" value={{data.cool_temp}}></input>
+                    <button class="summer roundButton" id="coolIncrease" type="button">+</button>
                 </div>
                 <div>
                     <input id="tempSubmit" type="submit" value="Adjust Thermostat"></input>
@@ -113,10 +117,6 @@
             </label>
         </section>
     </main>
-    <script>
-        const data = JSON.parse('{{ data | tojson | safe}}');
-
-    </script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script type="module" src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 </body>

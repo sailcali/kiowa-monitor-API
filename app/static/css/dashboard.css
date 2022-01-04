@@ -52,6 +52,37 @@ main {
   margin: 0px 30px;
 }
 
+#heattemp {
+  align-items: center;
+  margin-right: 20px;
+  margin-left: 20px;
+}
+#cooltemp {
+  align-items: center;
+  margin-right: 20px;
+  margin-left: 20px;
+}
+
+.roundButton {
+  background-color: #04AA6D;
+  border: none;
+  color: white;
+  text-decoration: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  margin: 4px 2px;
+  border-radius: 50%;
+}
+
+.winter {
+  display: none;
+}
+
+.summer {
+  display: none;
+}
 #temperatureContainer {
   height: 350px;
   width: 300px;
@@ -73,6 +104,10 @@ align-items: center;
 #landscapeDelaySelector {
   display: flex;
   flex-direction: row;
+}
+
+#landscapeDelaySetTime {
+  display: none;
 }
 
 main input {
