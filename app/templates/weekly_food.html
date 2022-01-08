@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Kiowa Food Planner</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/icons/favicon.ico') }}"/>	
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/weekly_food.css') }}">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+        const data = JSON.parse('{{ data | tojson | safe}}');
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Kiowa Food Planner</h1>
+    </header>
+    <main>
+        <table>
+            <thead>
+                <tr id='table-header'>
+                    <th class="column1"></th>
+                    <th class="column1"></th>
+                    <th class="column2"></th>
+                    <th class="column3"></th>
+                    <th class="column4"></th>
+                    <th class="column5"></th>
+                </tr>
+            </thead>
+            <tbody id='table-body'>
+            </tbody>
+        </table>
+        <section id="newFoodDashboard">
+            <h2>New Food Entry</h2>
+            <form id="newFoodForm" method="POST" action="/food/schedule">
+                <label class="form-label" id="dateForEntry" for="date">Date</label>
+                <input class="input" type="text" id="date" name="date"></input>
+                <label class="form-label" id="mealForEntry" for="meal">Meal</label>
+                <input class="input" type="text" id="meal" name="meal"></input>
+                <label class="form-label" id="valueFromDropDown" for="food_items">Food Label</label>
+                <select name="food_items" id="food_items">
+                    {% for item in meals %}
+                    <option value='{{item}}'>{{item}}</option>
+                    {% endfor %}
+                </select>
+                <label class="form-label" id="valueFromIngredients" for="count">Ingredients</label>
+                <input class="input" name="ingredients" type="text" id="count" min="0" max="1000000" maxlength="20">
+                <input type="button" value="Cancel" class="button" id="cancel-button">
+                <input type="submit" value="OK" class="button button-white" id="ok-button">
+            </form>
+        </section>
+    </main>
+    <script type="module" src="{{ url_for('static', filename='js/weekly_food.js') }}"></script>
+</body>

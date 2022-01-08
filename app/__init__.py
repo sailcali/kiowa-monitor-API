@@ -23,19 +23,20 @@ def create_app(test_config=None):
     #         "SQLALCHEMY_TEST_DATABASE_URI")
 
     # Import models here for Alembic setup
-    from app.models import VenstarTemp, LightingStatus, EnphaseProduction
+    from app.models import VenstarTemp, LightingStatus, EnphaseProduction, FoodPlanner, Food
     
     db.init_app(app)
     migrate.init_app(app, db)
 
     # Register Blueprints here
-    from .routes import temps_bp, venstar_bp, login_bp, usage_bp, landscape_bp, api_bp
+    from .routes import temps_bp, venstar_bp, login_bp, usage_bp, landscape_bp, api_bp, food_bp
     app.register_blueprint(temps_bp)
     app.register_blueprint(venstar_bp)
     app.register_blueprint(login_bp)
     app.register_blueprint(usage_bp)
     app.register_blueprint(landscape_bp)
     app.register_blueprint(api_bp)
+    app.register_blueprint(food_bp)
     
 
     return app

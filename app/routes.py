@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, make_response, request, abort, render_template, redirect, url_for
 from flask.signals import request_finished
 from app import db
-from app.models import LightingStatus, VenstarTemp
+from app.models import LightingStatus, VenstarTemp, FoodPlanner, MealListing, Food
 from datetime import datetime, timedelta, date
 import requests
 from dotenv import load_dotenv
@@ -22,6 +22,7 @@ usage_bp = Blueprint('usage_bp', __name__, url_prefix='/usage')
 login_bp = Blueprint('login_bp', __name__, url_prefix='/')
 landscape_bp = Blueprint('landscape_bp', __name__, url_prefix='/landscape')
 api_bp = Blueprint('api_bp', __name__, url_prefix='/api')
+food_bp = Blueprint('food_bp', __name__, url_prefix='/food')
 
 @login_bp.route("", methods=['GET'])
 def login():
@@ -213,3 +214,34 @@ def change_landscape_state():
     db.session.add(new_entry)
     db.session.commit()
     return jsonify(new_entry.time_on), 201
+
+@food_bp.route("/schedule", methods=['GET', 'POST'])
+def get_food_schedule():
+    if request.method == "GET": 
+        food_list = Food.query.all()
+        meal_names = []
+        for food in food_list:
+            meal_names.append(food.food)
+        schedule = FoodPlanner.query.filter(FoodPlanner.date>=date.today()).all()
+        meals = {}
+        for meal in schedule:
+            meal_date = datetime.strftime(meal.date, '%Y-%m-%d')
+            try:
+                meals[meal_date]
+            except KeyError:
+                meals[meal_date] = []
+            meals[meal_date].append({'meal': meal.meal_list.meal, "food": meal.food.food, "source": meal.source})
+        return render_template('weekly_food.html', data=meals, meals=meal_names)
+    elif request.method == "POST":
+        
+        meal = MealListing.query.filter(MealListing.meal == request.form.get('meal')).first()
+        food = Food.query.filter(Food.food == request.form.get('food_items')).first()
+
+        new_meal = FoodPlanner(date=request.form.get('date'),
+                               meal_id=meal.id,
+                               food_id=food.id,
+                               source=request.form.get('ingredients'))
+
+        db.session.add(new_meal)
+        db.session.commit()
+        return redirect(url_for('food_bp.get_food_schedule'))

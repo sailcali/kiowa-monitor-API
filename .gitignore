@@ -1,6 +1,6 @@
 /migrations
 /templates
-
+/migrations_for_pi
 .vscode
 .DS_Store
 
