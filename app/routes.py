@@ -218,6 +218,14 @@ def change_landscape_state():
     db.session.commit()
     return jsonify(new_entry.time_on), 201
 
+@api_bp.route("/food", methods=["POST"])
+def food_tables():
+    new_food = Food(food=request.form.get('new_food'))
+    db.session.add(new_food)
+    db.session.commit()
+    return redirect(url_for('food_bp.get_food_schedule'))
+    
+
 @food_bp.route("/schedule", methods=['GET', 'POST'])
 def get_food_schedule():
     if request.method == "GET": 

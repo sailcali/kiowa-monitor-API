@@ -50,6 +50,14 @@
                 <input type="submit" value="OK" class="button button-white" id="ok-button">
             </form>
         </section>
+        <section id="newFoodItemForm">
+            <h2>New Food Item</h2>
+            <form id="newFoodForm" method="POST" action="/api/food">
+                <label for="new_food">New Food Item</label>
+                <input type="text" id="new_food" name="new_food"></input>
+                <input type="submit" value="OK" id="new_food_ok">
+            </form>
+        </section>
     </main>
     <script type="module" src="{{ url_for('static', filename='js/weekly_food.js') }}"></script>
 </body>
