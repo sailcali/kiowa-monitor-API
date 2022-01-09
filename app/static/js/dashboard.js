@@ -126,12 +126,70 @@ const adjustSetTemperature = (event) => {
     };
 }
 
+const getSmartThingsData = () => {
+    axios.get('api/smartthings/status')
+    .then((response) => {
+        for (var i=0; i<response.data['devices'].length; i++) {
+            if (response.data['devices'][i]['name'] === 'Pineapple') {
+                const pineappleSwitch = document.getElementById('pineappleLightSwitch');
+                if (response.data['devices'][i]['state'] == 'on') {
+                    pineappleSwitch.checked = true;
+                } else {
+                    pineappleSwitch.checked = false;
+                }      
+            } else if (response.data['devices'][i]['name'] === 'Bedroom Light') {
+                const bedroomSwitch = document.getElementById('bedroomLightSwitch');
+                if (response.data['devices'][i]['state'] == 'on') {
+                    bedroomSwitch.checked = true;
+                } else {
+                    bedroomSwitch.checked = false;
+                }      
+            } else if (response.data['devices'][i]['name'] === 'Garage Light') {
+                const garageSwitch = document.getElementById('garageLightSwitch');
+                if (response.data['devices'][i]['state'] == 'on') {
+                    garageSwitch.checked = true;
+                } else {
+                    garageSwitch.checked = false;
+                }      
+            } else if (response.data['devices'][i]['name'] === 'Dining Room Table') {
+                const diningSwitch = document.getElementById('diningLightSwitch');
+                if (response.data['devices'][i]['state'] == 'on') {
+                    diningSwitch.checked = true;
+                } else {
+                    diningSwitch.checked = false;
+                };      
+            };
+        };
+        
+        
+    })
+};
+
+const adjustLighting = (event) => {
+    console.log(event.target.checked);
+    axios.post('api/smartthings/status', {
+        light: event.target.id,
+        state: event.target.checked
+    })
+    .then((response) => {
+        console.log(response);
+    })
+};
+
 const registerEvents = () => {
     venstarModeSetting();
     const dateInput = document.getElementById('dateInputTemp');
     dateInput.addEventListener('input', changeDateHref);
     const lightingSwitch = document.getElementById('landscapeLightSwitch');
     lightingSwitch.addEventListener('click', adjustLandscapeLighting);
+    const pineappleSwitch = document.getElementById('pineappleLightSwitch');
+    pineappleSwitch.addEventListener('click', adjustLighting);
+    const diningSwitch = document.getElementById('diningLightSwitch');
+    diningSwitch.addEventListener('click', adjustLighting);
+    const garageSwitch = document.getElementById('garageLightSwitch');
+    garageSwitch.addEventListener('click', adjustLighting);
+    const bedroomSwitch = document.getElementById('bedroomLightSwitch');
+    bedroomSwitch.addEventListener('click', adjustLighting);
     const heat_increase = document.getElementById('heatIncrease');
     const heat_decrease = document.getElementById('heatDecrease');
     const cool_increase = document.getElementById('coolIncrease');
@@ -142,6 +200,7 @@ const registerEvents = () => {
     cool_decrease.addEventListener('click', adjustSetTemperature);
 
     getGarageData();
+    getSmartThingsData();
 };
   
   document.addEventListener('DOMContentLoaded', registerEvents);

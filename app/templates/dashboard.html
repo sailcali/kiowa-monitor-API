@@ -6,7 +6,7 @@
 	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dashboard.css') }}">
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="refresh" content="15">
+    <!-- <meta http-equiv="refresh" content="15"> -->
     <script>
         const data = JSON.parse('{{ data | tojson | safe}}');
     </script>
@@ -114,6 +114,29 @@
             </div>
             <label class="switch">
                 <input id='landscapeLightSwitch' type="checkbox">
+                <span class="slider round"></span>
+            </label>
+        </section>
+        <section id="smartThingsContainer" class="container">
+            <h1>Kiowa Lighting Status</h1>
+            <label>Pineapple</label>
+            <label class="switch">
+                <input id='pineappleLightSwitch' type="checkbox">
+                <span class="slider round"></span>
+            </label>
+            <label>Dining Room</label>
+            <label class="switch">
+                <input id='diningLightSwitch' type="checkbox">
+                <span class="slider round"></span>
+            </label>
+            <label>Garage</label>
+            <label class="switch">
+                <input id='garageLightSwitch' type="checkbox">
+                <span class="slider round"></span>
+            </label>
+            <label>Bedroom</label>
+            <label class="switch">
+                <input id='bedroomLightSwitch' type="checkbox">
                 <span class="slider round"></span>
             </label>
         </section>

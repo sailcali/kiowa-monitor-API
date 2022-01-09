@@ -6,8 +6,10 @@ from datetime import datetime, timedelta, date
 import requests
 from dotenv import load_dotenv
 import os
+from smartthings import SMARTTHINGS_DEVICES
 
 load_dotenv()
+SMARTTHINGS_TOKEN = os.environ.get("SMARTTHINGS_TOKEN")
 IP = os.environ.get("VENSTAR_IP")
 PI_ZERO_IP = os.environ.get("PI_ZERO_IP")
 VENSTAR_INFO_URL = 'http://' + IP + '/query/info'
@@ -15,6 +17,7 @@ VENSTAR_SENSOR_URL = 'http://' + IP + '/query/sensors'
 VENSTAR_RUNTIMES_URL = 'http://' + IP + '/query/runtimes'
 VENSTAR_CONTROL_URL = 'http://' + IP + '/control'
 GARAGE_PI_STATUS_URL = 'http://' + PI_ZERO_IP + '/get-status'
+SMARTTHINGS_DEVICES_URL = 'https://api.smartthings.com/v1/devices'
 
 temps_bp = Blueprint('temps_bp', __name__, url_prefix='/temps')
 venstar_bp = Blueprint('venstar_bp', __name__, url_prefix='/venstar')
@@ -245,3 +248,48 @@ def get_food_schedule():
         db.session.add(new_meal)
         db.session.commit()
         return redirect(url_for('food_bp.get_food_schedule'))
+
+@api_bp.route('/smartthings/status', methods=['GET', 'POST'])
+def interact_smartthings():
+    headers = {"Authorization": "Bearer " + SMARTTHINGS_TOKEN}
+    if request.method == 'GET':
+        states = {"devices": []}
+        for device, id in SMARTTHINGS_DEVICES.items():
+            response = requests.get(f'{SMARTTHINGS_DEVICES_URL}/{id}/status', headers=headers)
+            device_state = response.json()
+            states['devices'].append({"name": device, 'state': device_state['components']['main']['switch']['switch']['value']})
+        return jsonify(states)
+    if request.method == 'POST':
+        data = request.get_json()
+        new_state = ''
+        device = ''
+        if data['light'] == 'pineappleLightSwitch':
+            device = 'Pineapple'
+            if data['state']:
+                new_state = 'on'
+            else:
+                new_state = 'off'
+        elif data['light'] == 'diningLightSwitch':
+            device = 'Dining Room Table'
+            if data['state']:
+                new_state = 'on'
+            else:
+                new_state = 'off'
+        elif data['light'] == 'garageLightSwitch':
+            device = 'Garage Light'
+            if data['state']:
+                new_state = 'on'
+            else:
+                new_state = 'off'
+        elif data['light'] == 'bedroomLightSwitch':
+            device = 'Bedroom Light'
+            if data['state']:
+                new_state = 'on'
+            else:
+                new_state = 'off'
+        params = {'commands': [{"component": 'main',
+                                "capability": 'switch',
+                                "command": new_state}]}
+        requests.post(f"{SMARTTHINGS_DEVICES_URL}/{SMARTTHINGS_DEVICES[device]}/commands", headers=headers, json=params)
+        
+        return jsonify([])

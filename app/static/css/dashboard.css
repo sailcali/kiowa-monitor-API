@@ -110,6 +110,12 @@ align-items: center;
   display: none;
 }
 
+#smartThingsContainer {
+  height: 350px;
+  width: 300px;
+  align-items: center;
+}
+
 main input {
   width: 50px;
   padding: 10px 10px;

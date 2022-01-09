@@ -3,6 +3,8 @@
 /migrations_for_pi
 .vscode
 .DS_Store
+smartthings.py
+/local_migrations
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
