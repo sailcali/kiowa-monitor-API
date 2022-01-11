@@ -8,11 +8,13 @@ const addDay = (date, days) => {
 }
 
 const addData = (event) => {
-    var column_dates = [new Date(new Date().getTime() - (new Date().getTimezoneOffset() * 60000))]
+    var column_dates = [new Date()]
     for (var i=0; i<5; i++) {
         column_dates.push(addDay(column_dates[i], 1))
     }
-    var button_date = column_dates[event.target.id[7]-1].toISOString().substring(0, 10);
+    // var button_date = column_dates[event.target.id[7]-1].toISOString().substring(0, 10);
+    var button_date = new Date(column_dates[event.target.id[7]-1].getTime() - (column_dates[event.target.id[7]-1].getTimezoneOffset() * 60000)).toISOString().substring(0, 10);
+    
     var button_meal = meal_names[event.target.id[6]]
     const new_date = document.getElementById('date');
     new_date.value = button_date
@@ -22,10 +24,8 @@ const addData = (event) => {
 
 const fill_tables = () => {
 
-    const current_date = new Date(new Date().getTime() - (new Date().getTimezoneOffset() * 60000));
-    
     const tableHeaderElements = document.getElementById('table-header').children;
-    var column_dates = [current_date]
+    var column_dates = [new Date()]
     for (var i=0; i<5; i++) {
         tableHeaderElements[i+1].innerHTML = days_of_week[column_dates[i].getDay()]
         column_dates.push(addDay(column_dates[i], 1))
@@ -39,13 +39,15 @@ const fill_tables = () => {
         var cell = row.insertCell(0);
         cell.innerHTML = meal_names[r];
         for (var c=1; c<6; c++) {
-            body_date = column_dates[c-1].toISOString().substring(0, 10);
+            body_date = new Date(column_dates[c-1].getTime() - (column_dates[c-1].getTimezoneOffset() * 60000)).toISOString().substring(0, 10);
+            console.log(column_dates[c-1])
+            console.log(body_date)
             cell = row.insertCell(c);
             if (data[body_date]) {
                 for (var f=0; f<data[body_date].length; f++) {
                 if (data[body_date][f]['meal'] === meal_names[r]) {
                     
-                    cell.innerHTML = '<button type="button">' + data[body_date][f]['food'] + '</button>';
+                    cell.innerHTML = '<button type="button" id="button' + r + c + '">' + data[body_date][f]['food'] + '</button>';
                     break
                 } else {
                     cell.innerHTML = '<button type="button" id="button' + r + c + '">Add Data</button>'

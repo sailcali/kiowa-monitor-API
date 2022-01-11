@@ -245,13 +245,16 @@ def get_food_schedule():
         return render_template('weekly_food.html', data=meals, meals=meal_names)
     elif request.method == "POST":
         
-        meal = MealListing.query.filter(MealListing.meal == request.form.get('meal')).first()
+        meal_of_day = MealListing.query.filter(MealListing.meal == request.form.get('meal')).first()
         food = Food.query.filter(Food.food == request.form.get('food_items')).first()
-
+        current_meal = FoodPlanner.query.filter(FoodPlanner.date == request.form.get('date'), FoodPlanner.meal_id == meal_of_day.id).first()
         new_meal = FoodPlanner(date=request.form.get('date'),
-                               meal_id=meal.id,
-                               food_id=food.id,
-                               source=request.form.get('ingredients'))
+                                    meal_id=meal_of_day.id,
+                                    food_id=food.id,
+                                    source=request.form.get('ingredients'))
+        
+        if current_meal:
+            db.session.delete(current_meal)
 
         db.session.add(new_meal)
         db.session.commit()
