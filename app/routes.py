@@ -298,6 +298,18 @@ def interact_smartthings():
                 new_state = 'on'
             else:
                 new_state = 'off'
+        elif data['light'] == 'lanternLightSwitch':
+            device = 'Drinking Lamp'
+            if data['state']:
+                new_state = 'on'
+            else:
+                new_state = 'off'
+        elif data['light'] == 'stringLightSwitch':
+            device = 'String Lights'
+            if data['state']:
+                new_state = 'on'
+            else:
+                new_state = 'off'
         params = {'commands': [{"component": 'main',
                                 "capability": 'switch',
                                 "command": new_state}]}

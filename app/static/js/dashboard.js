@@ -136,34 +136,47 @@ const getSmartThingsData = () => {
                     pineappleSwitch.checked = true;
                 } else {
                     pineappleSwitch.checked = false;
-                }      
+                };      
             } else if (response.data['devices'][i]['name'] === 'Bedroom Light') {
                 const bedroomSwitch = document.getElementById('bedroomLightSwitch');
                 if (response.data['devices'][i]['state'] == 'on') {
                     bedroomSwitch.checked = true;
                 } else {
                     bedroomSwitch.checked = false;
-                }      
+                };
             } else if (response.data['devices'][i]['name'] === 'Garage Light') {
                 const garageSwitch = document.getElementById('garageLightSwitch');
                 if (response.data['devices'][i]['state'] == 'on') {
                     garageSwitch.checked = true;
                 } else {
                     garageSwitch.checked = false;
-                }      
+                };  
             } else if (response.data['devices'][i]['name'] === 'Dining Room Table') {
                 const diningSwitch = document.getElementById('diningLightSwitch');
                 if (response.data['devices'][i]['state'] == 'on') {
                     diningSwitch.checked = true;
                 } else {
                     diningSwitch.checked = false;
-                };      
+                };
+            } else if (response.data['devices'][i]['name'] === 'String Lights') {
+                const stringSwitch = document.getElementById('stringLightSwitch');
+                if (response.data['devices'][i]['state'] == 'on') {
+                    stringSwitch.checked = true;
+                } else {
+                    stringSwitch.checked = false;
+                };
+            } else if (response.data['devices'][i]['name'] === 'Drinking Lamp') {
+                const lanternSwitch = document.getElementById('lanternLightSwitch');
+                if (response.data['devices'][i]['state'] == 'on') {
+                    lanternSwitch.checked = true;
+                } else {
+                    lanternSwitch.checked = false;
+                };
             };
         };
         
-        
-    })
-};
+});
+}
 
 const adjustLighting = (event) => {
     console.log(event.target.checked);
@@ -190,6 +203,10 @@ const registerEvents = () => {
     garageSwitch.addEventListener('click', adjustLighting);
     const bedroomSwitch = document.getElementById('bedroomLightSwitch');
     bedroomSwitch.addEventListener('click', adjustLighting);
+    const lanternSwitch = document.getElementById('lanternLightSwitch');
+    lanternSwitch.addEventListener('click', adjustLighting);
+    const stringSwitch = document.getElementById('stringLightSwitch');
+    stringSwitch.addEventListener('click', adjustLighting);
     const heat_increase = document.getElementById('heatIncrease');
     const heat_decrease = document.getElementById('heatDecrease');
     const cool_increase = document.getElementById('coolIncrease');
@@ -203,5 +220,4 @@ const registerEvents = () => {
     getSmartThingsData();
 };
   
-  document.addEventListener('DOMContentLoaded', registerEvents);
-  
+document.addEventListener('DOMContentLoaded', registerEvents);
