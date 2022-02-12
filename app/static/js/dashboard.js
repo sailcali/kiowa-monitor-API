@@ -33,7 +33,7 @@ const venstarModeSetting = () => {
 
     // Do not display heat modes in summer / cool modes in winter
     const current_month = new Date().getMonth()
-    if (current_month > 4 && current_month < 10) {
+    if (data.current_temp > 77) {
         for (let element of document.getElementsByClassName("summer")){
             element.style.display="flex";
          }
