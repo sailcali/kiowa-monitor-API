@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, make_response, request, abort, render_template, redirect, url_for
 from flask.signals import request_finished
 from app import db
-from app.models import LightingStatus, VenstarTemp, FoodPlanner, MealListing, Food
+from app.models import EnphaseProduction, LightingStatus, VenstarTemp, FoodPlanner, MealListing, Food
 from datetime import datetime, timedelta, date
 import requests
 from dotenv import load_dotenv
@@ -259,6 +259,11 @@ def get_food_schedule():
         db.session.add(new_meal)
         db.session.commit()
         return redirect(url_for('food_bp.get_food_schedule'))
+
+@api_bp.route('/solar-production/lifetime', methods=['GET'])
+def get_all_solar_production():
+    all_production = EnphaseProduction.func.sum(EnphaseProduction.production)
+    return make_response({"total_production": all_production}, 200)
 
 @api_bp.route('/smartthings/status', methods=['GET', 'POST'])
 def interact_smartthings():
