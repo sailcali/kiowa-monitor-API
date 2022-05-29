@@ -1,5 +1,7 @@
+import re
 from flask import Blueprint, jsonify, make_response, request, abort, render_template, redirect, url_for
 from flask.signals import request_finished
+import sqlalchemy
 from app import db
 from app.models import EnphaseProduction, LightingStatus, VenstarTemp, FoodPlanner, MealListing, Food
 from datetime import datetime, timedelta, date
@@ -244,7 +246,6 @@ def get_food_schedule():
             meals[meal_date].append({'meal': meal.meal_list.meal, "food": meal.food.food, "source": meal.source})
         return render_template('weekly_food.html', data=meals, meals=meal_names)
     elif request.method == "POST":
-        
         meal_of_day = MealListing.query.filter(MealListing.meal == request.form.get('meal')).first()
         food = Food.query.filter(Food.food == request.form.get('food_items')).first()
         current_meal = FoodPlanner.query.filter(FoodPlanner.date == request.form.get('date'), FoodPlanner.meal_id == meal_of_day.id).first()
@@ -262,8 +263,16 @@ def get_food_schedule():
 
 @api_bp.route('/solar-production/lifetime', methods=['GET'])
 def get_all_solar_production():
-    all_production = EnphaseProduction.func.sum(EnphaseProduction.production)
-    return make_response({"total_production": all_production}, 200)
+    all_production = db.session.query(sqlalchemy.func.sum(EnphaseProduction.production)).first()
+    return make_response({"total_production": all_production[0]}, 200)
+
+@api_bp.route('/solar-production/period', methods=['GET'])
+def get_period_solar_production():
+    request_body = request.get_json()
+    all_production = db.session.query(sqlalchemy.func.sum(EnphaseProduction.production)) \
+        .filter(sqlalchemy.and_(sqlalchemy.func.date(EnphaseProduction.time) >= request_body['start_date']), \
+        sqlalchemy.func.date(EnphaseProduction.time) <= request_body['end_date']).first()
+    return make_response({"period_production": all_production[0], "start_date": request_body['start_date'], "end_date": request_body['end_date']}, 200)
 
 @api_bp.route('/smartthings/status', methods=['GET', 'POST'])
 def interact_smartthings():
