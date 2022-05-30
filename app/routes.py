@@ -261,19 +261,6 @@ def get_food_schedule():
         db.session.commit()
         return redirect(url_for('food_bp.get_food_schedule'))
 
-@api_bp.route('/solar-production/lifetime', methods=['GET'])
-def get_all_solar_production():
-    all_production = db.session.query(sqlalchemy.func.sum(EnphaseProduction.production)).first()
-    return make_response({"total_production": all_production[0]}, 200)
-
-@api_bp.route('/solar-production/period', methods=['GET'])
-def get_period_solar_production():
-    request_body = request.get_json()
-    all_production = db.session.query(sqlalchemy.func.sum(EnphaseProduction.production)) \
-        .filter(sqlalchemy.and_(sqlalchemy.func.date(EnphaseProduction.time) >= request_body['start_date']), \
-        sqlalchemy.func.date(EnphaseProduction.time) <= request_body['end_date']).first()
-    return make_response({"period_production": all_production[0], "start_date": request_body['start_date'], "end_date": request_body['end_date']}, 200)
-
 @api_bp.route('/smartthings/status', methods=['GET', 'POST'])
 def interact_smartthings():
     headers = {"Authorization": "Bearer " + SMARTTHINGS_TOKEN}
@@ -330,3 +317,27 @@ def interact_smartthings():
         requests.post(f"{SMARTTHINGS_DEVICES_URL}/{SMARTTHINGS_DEVICES[device]}/commands", headers=headers, json=params)
         
         return jsonify([])
+
+@api_bp.route('/solar-production/lifetime', methods=['GET'])
+def get_all_solar_production():
+    all_production = db.session.query(sqlalchemy.func.sum(EnphaseProduction.production)).first()
+    return make_response({"total_production": all_production[0]}, 200)
+
+@api_bp.route('/solar-production/period-sum', methods=['GET'])
+def get_period_solar_production_sum():
+    request_body = request.get_json()
+    all_production = db.session.query(sqlalchemy.func.sum(EnphaseProduction.production)) \
+        .filter(sqlalchemy.and_(sqlalchemy.func.date(EnphaseProduction.time) >= request_body['start_date']), \
+        sqlalchemy.func.date(EnphaseProduction.time) <= request_body['end_date']).first()
+    return make_response({"period_production": all_production[0], "start_date": request_body['start_date'], "end_date": request_body['end_date']}, 200)
+
+@api_bp.route('/solar-production/period-data', methods=['GET'])
+def get_period_solar_production_data():
+    request_body = request.get_json()
+    all_production = EnphaseProduction.query \
+        .filter(sqlalchemy.and_(sqlalchemy.func.date(EnphaseProduction.time) >= request_body['start_date']), \
+        sqlalchemy.func.date(EnphaseProduction.time) <= request_body['end_date']).all()
+    response_data = []
+    for row in all_production:
+        response_data.append({'time': row['time'], 'production': row['production']})
+    return jsonify(response_data, 200)
