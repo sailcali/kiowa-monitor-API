@@ -339,5 +339,5 @@ def get_period_solar_production_data():
         sqlalchemy.func.date(EnphaseProduction.time) <= request_body['end_date']).all()
     response_data = []
     for row in all_production:
-        response_data.append({'time': row['time'], 'production': row['production']})
-    return jsonify(response_data, 200)
+        response_data.append({'time': row.time, 'production': row.production})
+    return make_response({'Results': response_data}, 200)
