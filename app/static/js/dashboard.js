@@ -179,7 +179,6 @@ const getSmartThingsData = () => {
 }
 
 const adjustLighting = (event) => {
-    console.log(event.target.checked);
     axios.post('api/smartthings/status', {
         light: event.target.id,
         state: event.target.checked
@@ -189,9 +188,20 @@ const adjustLighting = (event) => {
     })
 };
 
+const setCurrentDate = (dateInput) => {
+    const t = new Date();
+    const date = ('0' + t.getDate()).slice(-2);
+    const month = ('0' + (t.getMonth() + 1)).slice(-2);
+    const year = t.getFullYear();
+    dateInput.value = `${year}-${month}-${date}`;
+    changeDateHref();
+}
+
 const registerEvents = () => {
     venstarModeSetting();
+    
     const dateInput = document.getElementById('dateInputTemp');
+    setCurrentDate(dateInput);
     dateInput.addEventListener('input', changeDateHref);
     const lightingSwitch = document.getElementById('landscapeLightSwitch');
     lightingSwitch.addEventListener('click', adjustLandscapeLighting);
