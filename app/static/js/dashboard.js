@@ -117,11 +117,11 @@ const adjustSetTemperature = (event) => {
     const coolElement = document.getElementById('cooltemp')
     if (event.target.id == 'heatIncrease') {
         heatElement.value = parseInt(heatElement.value) + 1
-    } else if (event.target.id == 'coolDecrease') {
+    } else if (event.target.id == 'HeatDecrease') {
         heatElement.value = parseInt(heatElement.value) - 1
     } else if (event.target.id == 'coolIncrease') {
         coolElement.value = parseInt(coolElement.value) + 1
-    } else if (event.target.id == 'heatDecrease') {
+    } else if (event.target.id == 'coolDecrease') {
         coolElement.value = parseInt(coolElement.value) - 1
     };
 }
