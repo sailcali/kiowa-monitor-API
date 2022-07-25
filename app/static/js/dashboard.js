@@ -199,8 +199,7 @@ const setCurrentDate = (dateInput) => {
 
 const registerEvents = () => {
     venstarModeSetting();
-    getGarageData();
-    getSmartThingsData();
+
     const dateInput = document.getElementById('dateInputTemp');
     setCurrentDate(dateInput);
     dateInput.addEventListener('input', changeDateHref);
@@ -227,7 +226,8 @@ const registerEvents = () => {
     cool_increase.addEventListener('click', adjustSetTemperature);
     cool_decrease.addEventListener('click', adjustSetTemperature);
 
-    
+    getGarageData();
+    getSmartThingsData();
 };
   
 document.addEventListener('DOMContentLoaded', registerEvents);

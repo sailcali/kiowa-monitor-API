@@ -4,7 +4,6 @@ from flask_migrate import Migrate
 import os
 from dotenv import load_dotenv
 from flask_apscheduler import APScheduler
-# from app.landscape import landscape
 
 
 db = SQLAlchemy()
