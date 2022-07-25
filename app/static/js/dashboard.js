@@ -57,7 +57,7 @@ const adjustLandscapeLighting = () => {
         delay = newDelay.value
     }
     if (data.landscape_state === 'ON') {
-        axios.post('http://192.168.86.31/change-state', {
+        axios.post('landscape/change-state', {
             state: 0,
             delay_time: delay
           })
@@ -70,7 +70,7 @@ const adjustLandscapeLighting = () => {
 
           });
         } else {
-            axios.post('http://192.168.86.31/change-state', {
+            axios.post('landscape/change-state', {
             state: 1,
             delay_time: delay
           })
@@ -86,7 +86,7 @@ const adjustLandscapeLighting = () => {
     };
 
 const getGarageData = () => {
-    axios.get('http://192.168.86.31/get-status')
+    axios.get('api/garage-status')
     .then((response) => {
         const current_date = new Date()
         const delay_date = new Date(response.data['current_delay'])
@@ -199,7 +199,8 @@ const setCurrentDate = (dateInput) => {
 
 const registerEvents = () => {
     venstarModeSetting();
-    
+    getGarageData();
+    getSmartThingsData();
     const dateInput = document.getElementById('dateInputTemp');
     setCurrentDate(dateInput);
     dateInput.addEventListener('input', changeDateHref);
@@ -226,8 +227,7 @@ const registerEvents = () => {
     cool_increase.addEventListener('click', adjustSetTemperature);
     cool_decrease.addEventListener('click', adjustSetTemperature);
 
-    getGarageData();
-    getSmartThingsData();
+    
 };
   
 document.addEventListener('DOMContentLoaded', registerEvents);

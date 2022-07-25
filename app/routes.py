@@ -9,6 +9,8 @@ import requests
 from dotenv import load_dotenv
 import os
 from smartthings import SMARTTHINGS_DEVICES
+from app.landscape import landscape
+import configparser
 
 load_dotenv()
 SMARTTHINGS_TOKEN = os.environ.get("SMARTTHINGS_TOKEN")
@@ -20,6 +22,7 @@ VENSTAR_RUNTIMES_URL = 'http://' + IP + '/query/runtimes'
 VENSTAR_CONTROL_URL = 'http://' + IP + '/control'
 GARAGE_PI_STATUS_URL = 'http://' + PI_ZERO_IP + '/get-status'
 SMARTTHINGS_DEVICES_URL = 'https://api.smartthings.com/v1/devices'
+GARAGE_PICO_URL = 'http://192.168.86.33'
 
 temps_bp = Blueprint('temps_bp', __name__, url_prefix='/temps')
 venstar_bp = Blueprint('venstar_bp', __name__, url_prefix='/venstar')
@@ -205,20 +208,23 @@ def display_usage_from_today():
                      'cool_time': temps[i].cool_runtime - last_cool_time})
     return render_template('hvac-index.html', data=data)
 
-@landscape_bp.route("/update-state", methods=['POST'])
+@api_bp.route('/garage-status', methods=['GET'])
+def get_garage_status():
+    response = requests.get(GARAGE_PICO_URL)
+    response = response.json()
+    # last_entry = LightingStatus.query.order_by(LightingStatus.time.desc()).first()
+    config = configparser.ConfigParser()
+    config.read_file(open(r'delay_time.conf'))
+    delay = config.get('DelayDatetime', 'value')
+    return make_response({'temperature': response['temp'], 'current_delay': delay, 
+    'humidity': response['humidity'], 'lighting_state': response['current_status']['landscape'],}, 201)
+
+@landscape_bp.route('/change-state', methods=['POST'])
 def change_landscape_state():
-    """Updates database with new lighting state. Requirements: state and time. 
-    state = True or False
-    time = time of event"""
-    request_body = request.get_json()
-    last_entry = LightingStatus.query.order_by(LightingStatus.time.desc()).first()
-    new_entry = LightingStatus(time=request_body['time'], device='landscape', setting=request_body['state'])
-    if not request_body['state']:
-        time_on = datetime.strptime(new_entry.time, '%Y-%m-%d %H:%M:%S') - last_entry.time
-        new_entry.time_on = time_on.total_seconds()/60
-    db.session.add(new_entry)
-    db.session.commit()
-    return jsonify(new_entry.time_on), 201
+    body = request.get_json()
+    delay_time = datetime.today() + timedelta(minutes=int(body["delay_time"]))
+    new = landscape.change_landscape(body['state'], delay_time)
+    return make_response({'new_status': new, 'new_delay': delay_time}, 201)
 
 @api_bp.route("/food", methods=["POST"])
 def food_tables():
@@ -227,7 +233,6 @@ def food_tables():
     db.session.commit()
     return redirect(url_for('food_bp.get_food_schedule'))
     
-
 @food_bp.route("/schedule", methods=['GET', 'POST'])
 def get_food_schedule():
     if request.method == "GET": 
