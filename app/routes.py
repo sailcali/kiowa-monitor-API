@@ -16,6 +16,7 @@ load_dotenv()
 SMARTTHINGS_TOKEN = os.environ.get("SMARTTHINGS_TOKEN")
 IP = os.environ.get("VENSTAR_IP")
 PI_ZERO_IP = os.environ.get("PI_ZERO_IP")
+DIRECTORY = os.environ.get("DIRECTORY")
 VENSTAR_INFO_URL = 'http://' + IP + '/query/info'
 VENSTAR_SENSOR_URL = 'http://' + IP + '/query/sensors'
 VENSTAR_RUNTIMES_URL = 'http://' + IP + '/query/runtimes'
@@ -214,7 +215,7 @@ def get_garage_status():
     response = response.json()
     # last_entry = LightingStatus.query.order_by(LightingStatus.time.desc()).first()
     config = configparser.ConfigParser()
-    config.read_file(open(r'delay_time.conf'))
+    config.read_file(open(f'{DIRECTORY}/delay_time.conf'))
     delay = config.get('DelayDatetime', 'value')
     return make_response({'temperature': response['temp'], 'current_delay': delay, 
     'humidity': response['humidity'], 'lighting_state': response['current_status']['landscape'],}, 201)

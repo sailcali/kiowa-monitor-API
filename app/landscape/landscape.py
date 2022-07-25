@@ -2,6 +2,7 @@
 
 from astral.sun import sun
 from datetime import date
+import os
 import pytz
 from astral.geocoder import database, lookup
 from datetime import datetime, timedelta
@@ -10,6 +11,8 @@ import configparser
 # import logging
 from app import db
 from app.models import LightingStatus
+
+DIRECTORY = os.environ.get("DIRECTORY")
 
 def change_landscape(on_off=3, delay_request=False):
     """Algorithm for deciding state of landscape lighting.
@@ -23,13 +26,13 @@ def change_landscape(on_off=3, delay_request=False):
     # logging.basicConfig(level=logging.DEBUG, filename='main.log', filemode='w', format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
     print('checking landscape')
     config = configparser.ConfigParser()
-    config.read_file(open(r'delay_time.conf'))
+    config.read_file(open(f'{DIRECTORY}/delay_time.conf'))
     
     # Set the config file to the new delay request if given
     # Then set the current delay datetime
     if delay_request:
         config.set('DelayDatetime', 'value', datetime.strftime(delay_request, '%Y-%m-%d %H:%M:%S'))
-        with open('delay_time.conf', 'w') as configfile:
+        with open(f'{DIRECTORY}/delay_time.conf', 'w') as configfile:
             config.write(configfile)
     value = config.get('DelayDatetime', 'value')
     delay_datetime = datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
