@@ -7,7 +7,7 @@ from astral.geocoder import database, lookup
 from datetime import datetime, timedelta
 import requests
 import configparser
-import logging
+# import logging
 from app import db
 from app.models import LightingStatus
 
@@ -20,7 +20,7 @@ def change_landscape(on_off=3, delay_request=False):
     delay_request = false : config file is used as delay param"""
     
     # Setup logger and config file
-    logging.basicConfig(level=logging.DEBUG, filename='main.log', filemode='w', format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+    # logging.basicConfig(level=logging.DEBUG, filename='main.log', filemode='w', format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
     print('checking landscape')
     config = configparser.ConfigParser()
     config.read_file(open(r'delay_time.conf'))
@@ -34,7 +34,7 @@ def change_landscape(on_off=3, delay_request=False):
     value = config.get('DelayDatetime', 'value')
     delay_datetime = datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
 
-    logging.info('config opened')
+    # logging.info('config opened')
     
     # This will track if the lights are actually changed or not
     state_change = None
@@ -51,7 +51,7 @@ def change_landscape(on_off=3, delay_request=False):
     # Get the current settings from PICO
     response = requests.get('http://192.168.86.33/get-status')
     current_status = int(response.json()['current_status']['landscape'])
-    logging.info(current_status)
+    # logging.info(current_status)
     # If a delay to the programming is requested (on/off == 1 or 2)
     # Send code to PICO to adjust landscape
     # Add state to data
@@ -60,7 +60,7 @@ def change_landscape(on_off=3, delay_request=False):
         if response.json()['current_status']['landscape'] == 0:
             state_change = False
     elif on_off == 1 and current_status == 0:
-        logging.info('turning on')
+        # logging.info('turning on')
         response = requests.get('http://192.168.86.33/lights/on')
         if response.json()['current_status']['landscape'] == 1:
             state_change = True
@@ -68,7 +68,7 @@ def change_landscape(on_off=3, delay_request=False):
     # If the current delay time is not beyond the current time
     # Run the programming
     if delay_datetime < datetime.today():
-        logging.info('delay_datetime OK')
+        # logging.info('delay_datetime OK')
 
         # If sunset has occurred, make sure its on
         if sunset.time() < datetime.now().time():
@@ -82,7 +82,7 @@ def change_landscape(on_off=3, delay_request=False):
                 if response.json()['current_status']['landscape'] == 0:
                     state_change = False
     
-    logging.info(state_change)
+    # logging.info(state_change)
 
     # Update database with new state
     if state_change is not None:
