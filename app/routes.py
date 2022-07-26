@@ -220,6 +220,19 @@ def get_garage_status():
     return make_response({'temperature': response['temp'], 'current_delay': delay, 
     'humidity': response['humidity'], 'lighting_state': response['current_status']['landscape'],}, 201)
 
+@api_bp.route('/record-landscape-change', methods=['POST'])
+def record_landscape_change():
+    body = request.get_json()
+    strtime = datetime.strftime(datetime.today(), '%Y-%m-%d %H:%M:%S')
+    last_entry = LightingStatus.query.order_by(LightingStatus.time.desc()).first()
+    new_entry = LightingStatus(time=datetime.strptime(strtime, '%Y-%m-%d %H:%M:%S'), device='landscape', setting=body['state_change'])
+    if not body['state_change']:
+        time_on = new_entry.time - last_entry.time
+        new_entry.time_on = time_on.total_seconds()/60
+    db.session.add(new_entry)
+    db.session.commit()
+
+
 @landscape_bp.route('/change-state', methods=['POST'])
 def change_landscape_state():
     body = request.get_json()

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import re
 from astral.sun import sun
 from datetime import date
 import os
@@ -89,14 +90,7 @@ def change_landscape(on_off=3, delay_request=False):
 
     # Update database with new state
     if state_change is not None:
-        strtime = datetime.strftime(datetime.today(), '%Y-%m-%d %H:%M:%S')
-        last_entry = LightingStatus.query.order_by(LightingStatus.time.desc()).first()
-        new_entry = LightingStatus(time=datetime.strptime(strtime, '%Y-%m-%d %H:%M:%S'), device='landscape', setting=state_change)
-        if state_change is False:
-            time_on = new_entry.time - last_entry.time
-            new_entry.time_on = time_on.total_seconds()/60
-        db.session.add(new_entry)
-        db.session.commit()
+        requests.post('api/record-landscape-change', data={'state_change': state_change})
     
     return state_change
 
