@@ -1,9 +1,11 @@
 # kiowa-monitor-API
 
 All-encompassing smart home monitor website designed for personal LAN use only. 
+
 WARNING: NO SECURITY PROTOCOLS HAVE BEEN ADDED YET. THIS IS DESIGNED AT THIS POINT FOR LOCAL LAN USE ONLY.
 
 FLASK Endpoints:
+
 GET /api
 * Returns JSON of available API calls (not updated)
 
