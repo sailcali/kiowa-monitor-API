@@ -231,7 +231,7 @@ def record_landscape_change():
         new_entry.time_on = time_on.total_seconds()/60
     db.session.add(new_entry)
     db.session.commit()
-
+    return jsonify([]), 201
 
 @landscape_bp.route('/change-state', methods=['POST'])
 def change_landscape_state():
