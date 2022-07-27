@@ -39,8 +39,15 @@ def login():
 
 @api_bp.route("", methods=['GET'])
 def return_api_docs():
-    return jsonify({'temps': 'Returns temperatures from today', 
-                    '/current_temps': 'Returns current temperatures monitored by server'})
+    return jsonify({'/temps': 'Returns the temperature data from today as JSON', 
+                    '/current_temps': 'Returns current temperatures as JSON',
+                    '/garage-status': 'Returns garage PICO status (temperature and lighting) as JSON',
+                    '/record-landscape-change': "Records landscape lighting changes in database (requires boolean 'state_change')",
+                    '/food': 'Records new food item in database for food tracker',
+                    '/smartthings/status': 'Returns SmartThings devices states as JSON',
+                    '/solar-production/lifetime': 'Returns all known production data from database as JSON.',
+                    '/solar-production/period-sum': "Returns solar production data as a sum during a specified period. Requires 'start_date' and 'end_date' as YYYY-MM-DD.",
+                    '/solar-production/period/data': "Returns all known production data over a period from database as JSON. Requires 'start_date' and 'end_date' as YYYY-MM-DD."})
 
 @venstar_bp.route("", methods=['GET'])
 def kiowa_dashboard():
@@ -165,7 +172,7 @@ def return_current_temps_for_api():
     venstar_response = requests.get(VENSTAR_INFO_URL)
     venstar_info = venstar_response.json()
     hum = temps.humidity
-    return jsonify({'thermostat_temp': venstar_info['spacetemp'], 'living_room_temp': living_room, 'humidity': hum}), 200
+    return jsonify({'thermostat_temp': venstar_info['spacetemp'], 'living_room_temp': living_room, 'humidity': hum, 'remote_temp': temps.remote_temp}), 200
 
 @temps_bp.route("/today", methods=["GET"])
 def display_temps_from_today():
@@ -212,6 +219,8 @@ def display_usage_from_today():
 @api_bp.route('/garage-status', methods=['GET'])
 def get_garage_status():
     response = requests.get(GARAGE_PICO_URL)
+    if response.status_code != 200:
+        return make_response({'Status': 'No connection to Garage PICO'}, 401)
     response = response.json()
     # last_entry = LightingStatus.query.order_by(LightingStatus.time.desc()).first()
     config = configparser.ConfigParser()
