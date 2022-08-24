@@ -55,37 +55,62 @@ def kiowa_dashboard():
     authorized_ip = os.environ.get("IP_ALLOWED")
     if request.remote_addr not in authorized_ip:
         return make_response(f'Sorry, {request.remote_addr} your computer is not permitted to view this resource.', 401)
-
-    # Gather all necessary data
-    info_response = requests.get(VENSTAR_INFO_URL)
-    info = info_response.json()
-    sensor_response = requests.get(VENSTAR_SENSOR_URL)
-    sensors = sensor_response.json()
-    runtime_response = requests.get(VENSTAR_RUNTIMES_URL)
-    runtimes = runtime_response.json()
-    recent_data = VenstarTemp.query.order_by(VenstarTemp.time.desc()).first()
-    landscape_state = LightingStatus.query.order_by(LightingStatus.time.desc()).first()
-
-    # Gather the outdoor temp
-    remote_temp = 'N/A' # set to N/A in case its not found!
-    for sensor in sensors['sensors']:
-        if sensor['name'] == 'Remote':
-            remote_temp = sensor['temp']
+    
+    # Transfer Values
     # Change lighting bool to ON or OFF
     lighting_bool = {1: 'ON', 0: 'OFF'}
     # Change mode data (0,1,2,3) to understandable strings
     venstar_modes = {0: 'OFF', 1: 'HEAT', 2: 'COOL', 3: 'AUTO'}
     # Change fan state to ON or AUTO
     fan_states = {0: 'AUTO', 1: 'ON'}
-
-    data = {'current_temp': int(info['spacetemp']), 'outside_temp': int(remote_temp), 
-            'heat_temp': int(info['heattemp']), 'cool_temp': int(info['cooltemp']),
-            'mode': venstar_modes[info['mode']], 'fan_setting': fan_states[info['fan']], 'humidity': recent_data.humidity, 
-            'living_room_temp': int(recent_data.pi_temp), 'heat_time': runtimes['runtimes'][-1]['heat1'], 
-            'cool_time': runtimes['runtimes'][-1]['cool1'], 'landscape_state': lighting_bool[landscape_state.setting], 
-            'last_landscape_change': landscape_state.time}
     
-    return render_template('dashboard.html', data=data)
+    # Set Default Values
+    remote_temp = 'N/A' # set to N/A in case its not found!
+    heat_time = 'N/A'
+    cool_time = 'N/A'
+    fan_setting = 'AUTO'
+    venstar_mode = 'OFF'
+    heat_setting = 0
+    cool_setting = 0
+    therm_temp = None
+    recent_data = VenstarTemp.query.order_by(VenstarTemp.time.desc()).first()
+    landscape_state = LightingStatus.query.order_by(LightingStatus.time.desc()).first()
+
+    # Gather all necessary real-time data
+    try:
+        info_response = requests.get(VENSTAR_INFO_URL)
+        info = info_response.json()
+        sensor_response = requests.get(VENSTAR_SENSOR_URL)
+        sensors = sensor_response.json()
+        runtime_response = requests.get(VENSTAR_RUNTIMES_URL)
+        runtimes = runtime_response.json()
+    except requests.exceptions.RequestException as e:
+        print(e)
+    else:
+        # Set remote temperature (outdoor)
+        for sensor in sensors['sensors']:
+            if sensor['name'] == 'Remote':
+                remote_temp = int(sensor['temp'])
+
+        # Collect and transpose real-time data
+        heat_time = runtimes['runtimes'][-1]['heat1']
+        cool_time = runtimes['runtimes'][-1]['cool1']
+        fan_setting = fan_states[info['fan']]
+        venstar_mode = venstar_modes[info['mode']]
+        heat_setting = int(info['heattemp'])
+        cool_setting = int(info['cooltemp'])
+        therm_temp = int(info['spacetemp'])
+        
+    finally:
+        # Collect final into dictionary for transfer
+        data = {'current_temp': therm_temp, 'outside_temp': remote_temp, 
+                'heat_temp': heat_setting, 'cool_temp': cool_setting,
+                'mode': venstar_mode, 'fan_setting': fan_setting, 'humidity': recent_data.humidity, 
+                'living_room_temp': int(recent_data.pi_temp), 'heat_time': heat_time, 
+                'cool_time': cool_time, 'landscape_state': lighting_bool[landscape_state.setting], 
+                'last_landscape_change': landscape_state.time}
+        
+        return render_template('dashboard.html', data=data)
 
 @venstar_bp.route("", methods=['POST'])
 def venstar_changes():
