@@ -6,7 +6,7 @@
 	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dashboard.css') }}">
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="refresh" content="15">
+    <!-- <meta http-equiv="refresh" content="15"> -->
     <script>
         const data = JSON.parse('{{ data | tojson | safe}}');
     </script>
@@ -35,6 +35,7 @@
             </li> -->
             <li><a href='/food/schedule'>View Food Schedule</a></li>
             <li><a href='http://192.168.86.38:8000'>Backyard Cam</a></li>
+            <li><a href='/api/bedtime'>Bedtime!</a></li>
         </ul>
     </nav>
     <main>
@@ -122,32 +123,32 @@
             <h1>Kiowa Lighting Status</h1>
             <label>Pineapple</label>
             <label class="switch">
-                <input id='pineappleLightSwitch' type="checkbox">
+                <input id='pineappleSwitch' type="checkbox">
                 <span class="slider round"></span>
             </label>
             <label>Dining Room</label>
             <label class="switch">
-                <input id='diningLightSwitch' type="checkbox">
+                <input id='diningroomSwitch' type="checkbox">
                 <span class="slider round"></span>
             </label>
             <label>Garage</label>
             <label class="switch">
-                <input id='garageLightSwitch' type="checkbox">
+                <input id='garageSwitch' type="checkbox">
                 <span class="slider round"></span>
             </label>
             <label>Bedroom</label>
             <label class="switch">
-                <input id='bedroomLightSwitch' type="checkbox">
+                <input id='bedroomSwitch' type="checkbox">
                 <span class="slider round"></span>
             </label>
             <label>Lantern</label>
             <label class="switch">
-                <input id='lanternLightSwitch' type="checkbox">
+                <input id='lanternSwitch' type="checkbox">
                 <span class="slider round"></span>
             </label>
             <label>String Lights</label>
             <label class="switch">
-                <input id='stringLightSwitch' type="checkbox">
+                <input id='stringlightSwitch' type="checkbox">
                 <span class="slider round"></span>
             </label>
         </section>

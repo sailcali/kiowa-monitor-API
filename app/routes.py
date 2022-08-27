@@ -3,7 +3,7 @@ from flask import Blueprint, jsonify, make_response, request, abort, render_temp
 from flask.signals import request_finished
 import sqlalchemy
 from app import db
-from app.models import EnphaseProduction, LightingStatus, VenstarTemp, FoodPlanner, MealListing, Food
+from app.models import EnphaseProduction, LightingStatus, VenstarTemp, FoodPlanner, MealListing, Food, Bedtime
 from datetime import datetime, timedelta, date
 import requests
 from dotenv import load_dotenv
@@ -328,37 +328,37 @@ def interact_smartthings():
         data = request.get_json()
         new_state = ''
         device = ''
-        if data['light'] == 'pineappleLightSwitch':
+        if data['light'] == 'pineappleSwitch':
             device = 'Pineapple'
             if data['state']:
                 new_state = 'on'
             else:
                 new_state = 'off'
-        elif data['light'] == 'diningLightSwitch':
-            device = 'Dining Room Table'
+        elif data['light'] == 'diningroomSwitch':
+            device = 'Dining Room'
             if data['state']:
                 new_state = 'on'
             else:
                 new_state = 'off'
-        elif data['light'] == 'garageLightSwitch':
-            device = 'Garage Light'
+        elif data['light'] == 'garageSwitch':
+            device = 'Garage'
             if data['state']:
                 new_state = 'on'
             else:
                 new_state = 'off'
-        elif data['light'] == 'bedroomLightSwitch':
-            device = 'Bedroom Light'
+        elif data['light'] == 'bedroomSwitch':
+            device = 'Bedroom'
             if data['state']:
                 new_state = 'on'
             else:
                 new_state = 'off'
-        elif data['light'] == 'lanternLightSwitch':
-            device = 'Drinking Lamp'
+        elif data['light'] == 'lanternSwitch':
+            device = 'Lantern'
             if data['state']:
                 new_state = 'on'
             else:
                 new_state = 'off'
-        elif data['light'] == 'stringLightSwitch':
+        elif data['light'] == 'stringlightSwitch':
             device = 'String Lights'
             if data['state']:
                 new_state = 'on'
@@ -370,6 +370,19 @@ def interact_smartthings():
         requests.post(f"{SMARTTHINGS_DEVICES_URL}/{SMARTTHINGS_DEVICES[device]}/commands", headers=headers, json=params)
         
         return jsonify([])
+
+@api_bp.route('/bedtime', methods=['GET'])
+def set_bedtime():
+    headers = {"Authorization": "Bearer " + SMARTTHINGS_TOKEN}
+    params = {'commands': [{"component": 'main',
+                                "capability": 'switch',
+                                "command": 'off'}]}
+    requests.post(f"{SMARTTHINGS_DEVICES_URL}/{SMARTTHINGS_DEVICES['Bedroom']}/commands", headers=headers, json=params)
+    requests.post(f"{SMARTTHINGS_DEVICES_URL}/{SMARTTHINGS_DEVICES['Pineapple']}/commands", headers=headers, json=params)
+    new_bedtime = Bedtime(time=datetime.now())
+    db.session.add(new_bedtime)
+    db.session.commit()
+    return redirect(url_for('venstar_bp.kiowa_dashboard'))
 
 @api_bp.route('/solar-production/lifetime', methods=['GET'])
 def get_all_solar_production():
