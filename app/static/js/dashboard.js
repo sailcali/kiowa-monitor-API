@@ -130,48 +130,13 @@ const getSmartThingsData = () => {
     axios.get('api/smartthings/status')
     .then((response) => {
         for (var i=0; i<response.data['devices'].length; i++) {
-            if (response.data['devices'][i]['name'] === 'Pineapple') {
-                const pineappleSwitch = document.getElementById('pineappleLightSwitch');
-                if (response.data['devices'][i]['state'] == 'on') {
-                    pineappleSwitch.checked = true;
-                } else {
-                    pineappleSwitch.checked = false;
-                };      
-            } else if (response.data['devices'][i]['name'] === 'Bedroom Light') {
-                const bedroomSwitch = document.getElementById('bedroomLightSwitch');
-                if (response.data['devices'][i]['state'] == 'on') {
-                    bedroomSwitch.checked = true;
-                } else {
-                    bedroomSwitch.checked = false;
-                };
-            } else if (response.data['devices'][i]['name'] === 'Garage Light') {
-                const garageSwitch = document.getElementById('garageLightSwitch');
-                if (response.data['devices'][i]['state'] == 'on') {
-                    garageSwitch.checked = true;
-                } else {
-                    garageSwitch.checked = false;
-                };  
-            } else if (response.data['devices'][i]['name'] === 'Dining Room Table') {
-                const diningSwitch = document.getElementById('diningLightSwitch');
-                if (response.data['devices'][i]['state'] == 'on') {
-                    diningSwitch.checked = true;
-                } else {
-                    diningSwitch.checked = false;
-                };
-            } else if (response.data['devices'][i]['name'] === 'String Lights') {
-                const stringSwitch = document.getElementById('stringLightSwitch');
-                if (response.data['devices'][i]['state'] == 'on') {
-                    stringSwitch.checked = true;
-                } else {
-                    stringSwitch.checked = false;
-                };
-            } else if (response.data['devices'][i]['name'] === 'Drinking Lamp') {
-                const lanternSwitch = document.getElementById('lanternLightSwitch');
-                if (response.data['devices'][i]['state'] == 'on') {
-                    lanternSwitch.checked = true;
-                } else {
-                    lanternSwitch.checked = false;
-                };
+            var switchName = response.data['devices'][i]['name'].toLowerCase();
+            switchName = switchName.replace(/\s+/g, '');
+            var Switch = document.getElementById(switchName + 'Switch');
+            if (response.data['devices'][i]['state'] == 'on') {
+                Switch.checked = true;
+            } else {
+                Switch.checked = false;
             };
         };
         
@@ -205,17 +170,17 @@ const registerEvents = () => {
     dateInput.addEventListener('input', changeDateHref);
     const lightingSwitch = document.getElementById('landscapeLightSwitch');
     lightingSwitch.addEventListener('click', adjustLandscapeLighting);
-    const pineappleSwitch = document.getElementById('pineappleLightSwitch');
+    const pineappleSwitch = document.getElementById('pineappleSwitch');
     pineappleSwitch.addEventListener('click', adjustLighting);
-    const diningSwitch = document.getElementById('diningLightSwitch');
+    const diningSwitch = document.getElementById('diningroomSwitch');
     diningSwitch.addEventListener('click', adjustLighting);
-    const garageSwitch = document.getElementById('garageLightSwitch');
+    const garageSwitch = document.getElementById('garageSwitch');
     garageSwitch.addEventListener('click', adjustLighting);
-    const bedroomSwitch = document.getElementById('bedroomLightSwitch');
+    const bedroomSwitch = document.getElementById('bedroomSwitch');
     bedroomSwitch.addEventListener('click', adjustLighting);
-    const lanternSwitch = document.getElementById('lanternLightSwitch');
+    const lanternSwitch = document.getElementById('lanternSwitch');
     lanternSwitch.addEventListener('click', adjustLighting);
-    const stringSwitch = document.getElementById('stringLightSwitch');
+    const stringSwitch = document.getElementById('stringlightSwitch');
     stringSwitch.addEventListener('click', adjustLighting);
     const heat_increase = document.getElementById('heatIncrease');
     const heat_decrease = document.getElementById('heatDecrease');

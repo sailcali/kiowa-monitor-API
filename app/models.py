@@ -42,3 +42,8 @@ class MealListing(db.Model):
     id = db.Column(db.SmallInteger, primary_key=True, autoincrement=True)
     meal = db.Column(db.Text)
     meals = db.relationship("FoodPlanner", backref="meal_list")
+
+class Bedtime(db.Model):
+    __tablename__ = 'bedtime'
+    id = db.Column(db.SmallInteger, primary_key=True, autoincrement=True)
+    time = db.Column(db.DateTime)
