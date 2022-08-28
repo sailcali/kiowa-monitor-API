@@ -75,6 +75,8 @@ def kiowa_dashboard():
     therm_temp = None
     recent_data = VenstarTemp.query.order_by(VenstarTemp.time.desc()).first()
     landscape_state = LightingStatus.query.order_by(LightingStatus.time.desc()).first()
+    last_bedtime = Bedtime.query.order_by(Bedtime.time.desc()).first()
+    last_bedtime_time = datetime.strftime(last_bedtime.time, "%Y-%m-%d %I:%M %p")
 
     # Gather all necessary real-time data
     try:
@@ -108,7 +110,7 @@ def kiowa_dashboard():
                 'mode': venstar_mode, 'fan_setting': fan_setting, 'humidity': recent_data.humidity, 
                 'living_room_temp': int(recent_data.pi_temp), 'heat_time': heat_time, 
                 'cool_time': cool_time, 'landscape_state': lighting_bool[landscape_state.setting], 
-                'last_landscape_change': landscape_state.time}
+                'last_landscape_change': landscape_state.time, 'last_bedtime': last_bedtime_time}
         
         return render_template('dashboard.html', data=data)
 
