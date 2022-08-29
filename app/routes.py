@@ -1,4 +1,4 @@
-import re
+
 from flask import Blueprint, jsonify, make_response, request, abort, render_template, redirect, url_for
 from flask.signals import request_finished
 import sqlalchemy
@@ -65,7 +65,7 @@ def kiowa_dashboard():
     fan_states = {0: 'AUTO', 1: 'ON'}
 
     yesterday = datetime.now() - timedelta(hours=36)
-    today = date.today()
+    recent = datetime.now() - timedelta(hours=8)
     
     # Set Default Values
     remote_temp = 'N/A' # set to N/A in case its not found!
@@ -80,14 +80,13 @@ def kiowa_dashboard():
     today_bedtime_time = "No Data"
     recent_data = VenstarTemp.query.order_by(VenstarTemp.time.desc()).first()
     landscape_state = LightingStatus.query.order_by(LightingStatus.time.desc()).first()
-    last_bedtime = Bedtime.query.filter(Bedtime.time>=yesterday).order_by(Bedtime.time.desc()).first()
-    today_bedtime = Bedtime.query.filter(Bedtime.time==today).order_by(Bedtime.time.desc()).first()
-
-    if last_bedtime:
-        last_bedtime_time = datetime.strftime(last_bedtime.time, "%Y-%m-%d %I:%M %p")
-    if today_bedtime:
-        today_bedtime_time = datetime.strftime(today_bedtime.time, "%Y-%m-%d %I:%M %p")
-
+    bedtime = Bedtime.query.filter(Bedtime.time>=yesterday).order_by(Bedtime.time.desc()).all()
+    for row in bedtime:
+        if row.time > recent and today_bedtime_time == "No Data":
+            today_bedtime_time = datetime.strftime(row.time, "%Y-%m-%d %I:%M %p")
+        elif row.time < recent and last_bedtime_time == "No Data":
+            last_bedtime_time = datetime.strftime(row.time, "%Y-%m-%d %I:%M %p")
+    
     # Gather all necessary real-time data
     try:
         info_response = requests.get(VENSTAR_INFO_URL)
@@ -376,7 +375,7 @@ def interact_smartthings():
                 new_state = 'on'
             else:
                 new_state = 'off'
-        elif data['light'] == 'stringlightSwitch':
+        elif data['light'] == 'stringlightsSwitch':
             device = 'String Lights'
             if data['state']:
                 new_state = 'on'

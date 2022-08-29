@@ -7,7 +7,7 @@
 	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dashboard.css') }}">
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="refresh" content="15">
+    <meta http-equiv="refresh" content="20">
     <script>
         const data = JSON.parse('{{ data | tojson | safe}}');
     </script>
@@ -149,7 +149,7 @@
             </label>
             <label id="stringlightsLabel" class="crossedOutLabel">String Lights</label>
             <label class="switch">
-                <input id='stringlightSwitch' type="checkbox">
+                <input id='stringlightsSwitch' type="checkbox">
                 <span class="slider round"></span>
             </label>
         </section>
