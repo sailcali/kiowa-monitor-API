@@ -111,9 +111,23 @@ align-items: center;
 }
 
 #smartThingsContainer {
-  height: 600px;
+  height: 500px;
   width: 300px;
   align-items: center;
+}
+
+#bedtimeContainer {
+  height: 300px;
+  width: 300px;
+  align-items: center;
+}
+
+#bedtimeContainer div {
+  text-align: center;
+}
+
+#bedtimeContainer h1 {
+  margin-bottom: 20px;
 }
 
 main input {
@@ -241,4 +255,8 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
+}
+
+.crossedOutLabel {
+  text-decoration: line-through;
 }

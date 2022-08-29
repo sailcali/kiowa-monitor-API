@@ -133,6 +133,11 @@ const getSmartThingsData = () => {
             var switchName = response.data['devices'][i]['name'].toLowerCase();
             switchName = switchName.replace(/\s+/g, '');
             var Switch = document.getElementById(switchName + 'Switch');
+            
+            if (response.data['devices'][i]['state'] != 'OFFLINE') {
+                var labelName = document.getElementById(switchName + 'Label');
+            }
+            labelName.classList.remove("crossedOutLabel");
             if (response.data['devices'][i]['state'] == 'on') {
                 Switch.checked = true;
             } else {

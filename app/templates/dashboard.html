@@ -2,11 +2,12 @@
 <html lang="en">
 <head>
 	<title>Kiowa Dashboard</title>
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"> -->
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/icons/favicon.ico') }}"/>	
 	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dashboard.css') }}">
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- <meta http-equiv="refresh" content="15"> -->
+    <meta http-equiv="refresh" content="15">
     <script>
         const data = JSON.parse('{{ data | tojson | safe}}');
     </script>
@@ -121,37 +122,47 @@
         </section>
         <section id="smartThingsContainer" class="container">
             <h1>Kiowa Lighting Status</h1>
-            <p>Last Bedtime: {{data.last_bedtime}}</p>
-            <label>Pineapple</label>
+            <label id="pineappleLabel" class="crossedOutLabel">Pineapple</label>
             <label class="switch">
                 <input id='pineappleSwitch' type="checkbox">
                 <span class="slider round"></span>
             </label>
-            <label>Dining Room</label>
+            <label id="diningroomLabel" class="crossedOutLabel">Dining Room</label>
             <label class="switch">
                 <input id='diningroomSwitch' type="checkbox">
                 <span class="slider round"></span>
             </label>
-            <label>Garage</label>
+            <label id="garageLabel" class="crossedOutLabel">Garage</label>
             <label class="switch">
                 <input id='garageSwitch' type="checkbox">
                 <span class="slider round"></span>
             </label>
-            <label>Bedroom</label>
+            <label id="bedroomLabel" class="crossedOutLabel">Bedroom</label>
             <label class="switch">
                 <input id='bedroomSwitch' type="checkbox">
                 <span class="slider round"></span>
             </label>
-            <label>Lantern</label>
+            <label id="lanternLabel" class="crossedOutLabel">Lantern</label>
             <label class="switch">
                 <input id='lanternSwitch' type="checkbox">
                 <span class="slider round"></span>
             </label>
-            <label>String Lights</label>
+            <label id="stringlightsLabel" class="crossedOutLabel">String Lights</label>
             <label class="switch">
                 <input id='stringlightSwitch' type="checkbox">
                 <span class="slider round"></span>
             </label>
+        </section>
+        <section id="bedtimeContainer" class="container">
+            <h1>Bedtime Data</h1>
+            <div>
+                <h3>Last Night's Bedtime:</h3>
+                <p>{{data.last_bedtime}}</p>
+            </div>
+            <div>
+                <h3>Today's Bedtime:</h3>
+                <p>{{data.today_bedtime}}</p>
+            </div>
         </section>
     </main>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
