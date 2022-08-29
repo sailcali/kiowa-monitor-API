@@ -47,6 +47,7 @@ def create_app(test_config=None):
     from .routes.landscape import landscape_bp
     from .routes.api import api_bp
     from .routes.food import food_bp
+    from .routes.weather import weather_bp
 
     app.register_blueprint(temps_bp)
     app.register_blueprint(venstar_bp)
@@ -55,6 +56,7 @@ def create_app(test_config=None):
     app.register_blueprint(landscape_bp)
     app.register_blueprint(api_bp)
     app.register_blueprint(food_bp)
+    app.register_blueprint(weather_bp)
     
     return app
 
