@@ -376,7 +376,7 @@ def interact_smartthings():
                 new_state = 'on'
             else:
                 new_state = 'off'
-        elif data['light'] == 'stringlightSwitch':
+        elif data['light'] == 'stringlightsSwitch':
             device = 'String Lights'
             if data['state']:
                 new_state = 'on'
