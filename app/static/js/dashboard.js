@@ -185,7 +185,7 @@ const registerEvents = () => {
     bedroomSwitch.addEventListener('click', adjustLighting);
     const lanternSwitch = document.getElementById('lanternSwitch');
     lanternSwitch.addEventListener('click', adjustLighting);
-    const stringSwitch = document.getElementById('stringlightSwitch');
+    const stringSwitch = document.getElementById('stringlighsSwitch');
     stringSwitch.addEventListener('click', adjustLighting);
     const heat_increase = document.getElementById('heatIncrease');
     const heat_decrease = document.getElementById('heatDecrease');
