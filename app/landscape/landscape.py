@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import re
 from astral.sun import sun
 from datetime import date
 import os
@@ -9,8 +8,6 @@ from astral.geocoder import database, lookup
 from datetime import datetime, timedelta
 import requests
 import configparser
-from app import db
-from app.models import LightingStatus
 
 DIRECTORY = os.environ.get("DIRECTORY")
 

@@ -39,7 +39,15 @@ def create_app(test_config=None):
     
     
     # Register Blueprints here
-    from .routes import temps_bp, venstar_bp, login_bp, usage_bp, landscape_bp, api_bp, food_bp
+    from .routes.temps import temps_bp
+    from .routes.api import api_bp
+    from.routes.venstar import venstar_bp
+    from .login_route import login_bp
+    from .routes.usage import usage_bp
+    from .routes.landscape import landscape_bp
+    from .routes.api import api_bp
+    from .routes.food import food_bp
+
     app.register_blueprint(temps_bp)
     app.register_blueprint(venstar_bp)
     app.register_blueprint(login_bp)
@@ -48,8 +56,6 @@ def create_app(test_config=None):
     app.register_blueprint(api_bp)
     app.register_blueprint(food_bp)
     
-
-
     return app
 
 
