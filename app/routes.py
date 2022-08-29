@@ -63,6 +63,9 @@ def kiowa_dashboard():
     venstar_modes = {0: 'OFF', 1: 'HEAT', 2: 'COOL', 3: 'AUTO'}
     # Change fan state to ON or AUTO
     fan_states = {0: 'AUTO', 1: 'ON'}
+
+    yesterday = datetime.now() - timedelta(hours=36)
+    today = date.today()
     
     # Set Default Values
     remote_temp = 'N/A' # set to N/A in case its not found!
@@ -73,10 +76,17 @@ def kiowa_dashboard():
     heat_setting = 0
     cool_setting = 0
     therm_temp = None
+    last_bedtime_time = "No Data"
+    today_bedtime_time = "No Data"
     recent_data = VenstarTemp.query.order_by(VenstarTemp.time.desc()).first()
     landscape_state = LightingStatus.query.order_by(LightingStatus.time.desc()).first()
-    last_bedtime = Bedtime.query.order_by(Bedtime.time.desc()).first()
-    last_bedtime_time = datetime.strftime(last_bedtime.time, "%Y-%m-%d %I:%M %p")
+    last_bedtime = Bedtime.query.filter(Bedtime.time>=yesterday).order_by(Bedtime.time.desc()).first()
+    today_bedtime = Bedtime.query.filter(Bedtime.time==today).order_by(Bedtime.time.desc()).first()
+
+    if last_bedtime:
+        last_bedtime_time = datetime.strftime(last_bedtime.time, "%Y-%m-%d %I:%M %p")
+    if today_bedtime:
+        today_bedtime_time = datetime.strftime(today_bedtime.time, "%Y-%m-%d %I:%M %p")
 
     # Gather all necessary real-time data
     try:
@@ -110,7 +120,8 @@ def kiowa_dashboard():
                 'mode': venstar_mode, 'fan_setting': fan_setting, 'humidity': recent_data.humidity, 
                 'living_room_temp': int(recent_data.pi_temp), 'heat_time': heat_time, 
                 'cool_time': cool_time, 'landscape_state': lighting_bool[landscape_state.setting], 
-                'last_landscape_change': landscape_state.time, 'last_bedtime': last_bedtime_time}
+                'last_landscape_change': landscape_state.time, 'last_bedtime': last_bedtime_time, 
+                'today_bedtime': today_bedtime_time}
         
         return render_template('dashboard.html', data=data)
 
@@ -322,9 +333,14 @@ def interact_smartthings():
     if request.method == 'GET':
         states = {"devices": []}
         for device, id in SMARTTHINGS_DEVICES.items():
-            response = requests.get(f'{SMARTTHINGS_DEVICES_URL}/{id}/status', headers=headers)
-            device_state = response.json()
-            states['devices'].append({"name": device, 'state': device_state['components']['main']['switch']['switch']['value']})
+            status_response = requests.get(f'{SMARTTHINGS_DEVICES_URL}/{id}/status', headers=headers)
+            health_response = requests.get(f'{SMARTTHINGS_DEVICES_URL}/{id}/health', headers=headers)
+            device_state = status_response.json()
+            device_health = health_response.json()
+            if device_health['state'] == 'OFFLINE':
+                states['devices'].append({"name": device, 'state': 'OFFLINE'})
+            else:
+                states['devices'].append({"name": device, 'state': device_state['components']['main']['switch']['switch']['value']})
         return jsonify(states)
     if request.method == 'POST':
         data = request.get_json()
