@@ -96,7 +96,7 @@ align-items: center;
 } */
 
 #lightingContainer {
-  height: 350px;
+  height: 300px;
   width: 300px;
   align-items: center;
   }
@@ -111,7 +111,7 @@ align-items: center;
 }
 
 #smartThingsContainer {
-  height: 500px;
+  height: 575px;
   width: 300px;
   align-items: center;
 }
@@ -192,7 +192,9 @@ main input {
     font-weight: bold;
     background-color: grey;
   } */
-/*                                             = THIS IS FOR THE LIGHTING SELECTOR SWITCH                  */
+
+
+  /*  = THIS IS FOR THE LIGHTING SELECTOR SWITCH                  */
 /* The switch - the box around the slider */
 .switch {
   position: relative;
