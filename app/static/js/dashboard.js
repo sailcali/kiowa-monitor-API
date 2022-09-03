@@ -108,6 +108,7 @@ const getGarageData = () => {
             landscapeDelayElement.innerHTML = "Delay Set Time: " + response.data['current_delay'];
             landscapeDelayElement.style.display="flex";
         }
+        setLandscapeListener();
         
     })
 }
@@ -143,6 +144,7 @@ const getSmartThingsData = () => {
             } else {
                 Switch.checked = false;
             };
+        addLightListeners();
         };
         
 });
@@ -167,14 +169,12 @@ const setCurrentDate = (dateInput) => {
     changeDateHref();
 }
 
-const registerEvents = () => {
-    venstarModeSetting();
-
-    const dateInput = document.getElementById('dateInputTemp');
-    setCurrentDate(dateInput);
-    dateInput.addEventListener('input', changeDateHref);
+const addLandscapeListener = () => {
     const lightingSwitch = document.getElementById('landscapeLightSwitch');
     lightingSwitch.addEventListener('click', adjustLandscapeLighting);
+}
+
+const addLightListeners = () => {
     const pineappleSwitch = document.getElementById('pineappleSwitch');
     pineappleSwitch.addEventListener('click', adjustLighting);
     const diningSwitch = document.getElementById('diningroomSwitch');
@@ -187,6 +187,17 @@ const registerEvents = () => {
     lanternSwitch.addEventListener('click', adjustLighting);
     const stringSwitch = document.getElementById('stringlightsSwitch');
     stringSwitch.addEventListener('click', adjustLighting);
+    const frontdoorSwitch = document.getElementById('frontdoorSwitch');
+    frontdoorSwitch.addEventListener('click', adjustLighting);
+}
+
+const registerEvents = () => {
+    venstarModeSetting();
+
+    const dateInput = document.getElementById('dateInputTemp');
+    setCurrentDate(dateInput);
+    dateInput.addEventListener('input', changeDateHref);
+    
     const heat_increase = document.getElementById('heatIncrease');
     const heat_decrease = document.getElementById('heatDecrease');
     const cool_increase = document.getElementById('coolIncrease');

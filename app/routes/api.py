@@ -22,6 +22,7 @@ VENSTAR_CONTROL_URL = 'http://' + IP + '/control'
 GARAGE_PI_STATUS_URL = 'http://' + PI_ZERO_IP + '/get-status'
 SMARTTHINGS_DEVICES_URL = 'https://api.smartthings.com/v1/devices'
 GARAGE_PICO_URL = 'http://192.168.86.33'
+WEATHER_APP_ID = os.environ.get("WEATHER_APP_ID")
 
 api_bp = Blueprint('api_bp', __name__, url_prefix='/api')
 
@@ -114,6 +115,10 @@ def interact_smartthings():
         states = {"devices": []}
         for device, id in SMARTTHINGS_DEVICES.items():
             status_response = requests.get(f'{SMARTTHINGS_DEVICES_URL}/{id}/status', headers=headers)
+            if status_response.status_code == 400:
+                states['devices'].append({"name": device, 'state': 'OFFLINE'})
+                continue
+
             health_response = requests.get(f'{SMARTTHINGS_DEVICES_URL}/{id}/health', headers=headers)
             device_state = status_response.json()
             device_health = health_response.json()
@@ -162,6 +167,12 @@ def interact_smartthings():
                 new_state = 'on'
             else:
                 new_state = 'off'
+        elif data['light'] == 'frontdoorSwitch':
+            device = 'Front Door'
+            if data['state']:
+                new_state = 'on'
+            else:
+                new_state = 'off'
         params = {'commands': [{"component": 'main',
                                 "capability": 'switch',
                                 "command": new_state}]}
@@ -205,3 +216,10 @@ def get_period_solar_production_data():
     for row in all_production:
         response_data.append({'time': row.time, 'production': row.production})
     return make_response({'Results': response_data}, 200)
+
+@api_bp.route('/weather/outlook', methods=["GET"])
+def get_weather_outlook():
+    params = {"lat": 32.782, "lon": -117.04, "units": "imperial", "appid": WEATHER_APP_ID}
+    response = requests.get("https://api.openweathermap.org/data/2.5/forecast", params=params)
+    j = response.json()
+    return make_response(j, 200)
