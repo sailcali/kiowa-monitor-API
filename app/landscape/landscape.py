@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/var/www/kiowa-monitor-API/venv/bin/python3
 
 from astral.sun import sun
 from datetime import date
@@ -63,7 +63,12 @@ def change_landscape(on_off=3, delay_request=False):
             response = requests.get('http://192.168.86.33/lights/on')
             if response.json()['current_status']['landscape'] == 1:
                 state_change = True
-        
+        # If its midnight turn the landscape lights off
+        if datetime.now().hour == 0 and current_status == 1:
+            response = requests.get('http://192.168.86.33/lights/off')
+            if response.json()['current_status']['landscape'] == 0:
+                state_change = False
+            
         # Update database with new state
         if state_change is not None:
             try:
