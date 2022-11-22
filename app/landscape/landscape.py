@@ -59,7 +59,7 @@ def change_landscape(on_off=3, delay_request=False):
                 state_change = True
 
         # If sunset has occurred and lights are off, turn it on
-        if current_status == 0 and sunset.time() > datetime.now().time():
+        if current_status == 0 and sunset.time() < datetime.now().time():
             response = requests.get('http://192.168.86.33/lights/on')
             if response.json()['current_status']['landscape'] == 1:
                 state_change = True
