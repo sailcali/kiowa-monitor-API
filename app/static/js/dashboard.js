@@ -108,7 +108,7 @@ const getGarageData = () => {
             landscapeDelayElement.innerHTML = "Delay Set Time: " + response.data['current_delay'];
             landscapeDelayElement.style.display="flex";
         }
-        setLandscapeListener();
+        addLandscapeListener();
         
     })
 }
