@@ -3,8 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import os
 from dotenv import load_dotenv
-from flask_apscheduler import APScheduler
-
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -22,21 +20,12 @@ def create_app(test_config=None):
     #     app.config["TESTING"] = True
     #     app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
     #         "SQLALCHEMY_TEST_DATABASE_URI")
-
-    scheduler = APScheduler()
     
     # Import models here for Alembic setup
     from app.models import VenstarTemp, LightingStatus, EnphaseProduction, FoodPlanner, Food
     
     db.init_app(app)
     migrate.init_app(app, db)
-    scheduler.api_enabled = True
-    scheduler.init_app(app)
-
-    from app.landscape import landscape
-    scheduler.add_job(id = 'Scheduled Task', func=landscape.change_landscape, trigger="interval", seconds=60)
-    scheduler.start()
-    
     
     # Register Blueprints here
     from .routes.temps import temps_bp

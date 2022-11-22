@@ -106,7 +106,7 @@
             <p class='winter'>Heat Time Today: {{data.heat_time}} minutes</p>
             <p class='summer'>Cool Time Today: {{data.cool_time}} minutes</p>
         </section> -->
-        <section id="lightingContainer" class="container">
+        <!-- <section id="lightingContainer" class="container">
             <h1>Landscape Lighting Status</h1>
             <p id="landscapeState">Landscape Lighting: {{data.landscape_state}}</p>
             <p>At time: {{data.last_landscape_change}}</p>
@@ -120,7 +120,7 @@
                 <input id='landscapeLightSwitch' type="checkbox">
                 <span class="slider round"></span>
             </label>
-        </section>
+        </section> -->
         <section id="smartThingsContainer" class="container">
             <h1>Kiowa Lighting Status</h1>
             <label id="pineappleLabel" class="crossedOutLabel">Pineapple</label>
@@ -156,6 +156,11 @@
             <label id="stringlightsLabel" class="crossedOutLabel">String Lights</label>
             <label class="switch">
                 <input id='stringlightsSwitch' type="checkbox">
+                <span class="slider round"></span>
+            </label>
+            <label id="landscapelightsLabel" class="crossedOutLabel">Landscape Lights</label>
+            <label class="switch">
+                <input id='landscapeLightSwitch' type="checkbox">
                 <span class="slider round"></span>
             </label>
         </section>

@@ -82,14 +82,16 @@ def get_garage_status():
         return make_response({'Status': 'No connection to Garage PICO'}, 401)
     response = response.json()
     # last_entry = LightingStatus.query.order_by(LightingStatus.time.desc()).first()
-    config = configparser.ConfigParser()
-    config.read_file(open(f'{DIRECTORY}/delay_time.conf'))
-    delay = config.get('DelayDatetime', 'value')
-    return make_response({'temperature': response['temp'], 'current_delay': delay, 
+    # config = configparser.ConfigParser()
+    # config.read_file(open(f'{DIRECTORY}/delay_time.conf'))
+    # delay = config.get('DelayDatetime', 'value')
+    return make_response({'temperature': response['temp'], 
     'humidity': response['humidity'], 'lighting_state': response['current_status']['landscape'],}, 201)
 
 @api_bp.route('/record-landscape-change', methods=['POST'])
 def record_landscape_change():
+    """Makes new entry in the database to update the lighting status
+    Note: Requires a state_change boolean"""
     body = request.get_json()
     strtime = datetime.strftime(datetime.today(), '%Y-%m-%d %H:%M:%S')
     last_entry = LightingStatus.query.order_by(LightingStatus.time.desc()).first()
