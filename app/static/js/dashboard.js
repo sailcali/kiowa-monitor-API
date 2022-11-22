@@ -86,11 +86,11 @@ const getGarageData = () => {
         
         if (response.data['lighting_state'] == 1) {
             slider.checked = true
-            var labelName = document.getElementById('landscapelightsLabel');
-            labelName.classList.remove("crossedOutLabel");
         } else {
             slider.checked = false
         }
+        var labelName = document.getElementById('landscapelightsLabel');
+        labelName.classList.remove("crossedOutLabel");
         addLandscapeListener();
     })
 }
