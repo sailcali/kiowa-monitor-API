@@ -16,8 +16,8 @@ def change_landscape(on_off=3, delay_request=False):
     on_off = 0 : turn off
     on_off = 1 : turn on
     on_off = 3 : no argument given, default to check programming
-    delay_request = {datetime} : gets logged in config file and used as delay param
-    delay_request = false : config file is used as delay param"""
+    DEP: delay_request = {datetime} : gets logged in config file and used as delay param
+    DEP: delay_request = false : config file is used as delay param"""
     
     # Setup logger and config file
     # config = configparser.ConfigParser()

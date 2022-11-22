@@ -86,7 +86,7 @@ def get_garage_status():
     # config.read_file(open(f'{DIRECTORY}/delay_time.conf'))
     # delay = config.get('DelayDatetime', 'value')
     return make_response({'temperature': response['temp'], 
-    'humidity': response['humidity'], 'lighting_state': response['current_status']['landscape'],}, 201)
+    'humidity': response['humidity'], 'lighting_state': response['current_status']['landscape'],}, 200)
 
 @api_bp.route('/record-landscape-change', methods=['POST'])
 def record_landscape_change():
