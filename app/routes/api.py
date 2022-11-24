@@ -190,6 +190,7 @@ def set_bedtime():
                                 "command": 'off'}]}
     requests.post(f"{SMARTTHINGS_DEVICES_URL}/{SMARTTHINGS_DEVICES['Bedroom']}/commands", headers=headers, json=params)
     requests.post(f"{SMARTTHINGS_DEVICES_URL}/{SMARTTHINGS_DEVICES['Pineapple']}/commands", headers=headers, json=params)
+    requests.post(f"{SMARTTHINGS_DEVICES_URL}/{SMARTTHINGS_DEVICES['Lantern']}/commands", headers=headers, json=params)
     new_bedtime = Bedtime(time=datetime.now())
     db.session.add(new_bedtime)
     db.session.commit()
