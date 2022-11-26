@@ -82,14 +82,16 @@ def get_garage_status():
         return make_response({'Status': 'No connection to Garage PICO'}, 401)
     response = response.json()
     # last_entry = LightingStatus.query.order_by(LightingStatus.time.desc()).first()
-    config = configparser.ConfigParser()
-    config.read_file(open(f'{DIRECTORY}/delay_time.conf'))
-    delay = config.get('DelayDatetime', 'value')
-    return make_response({'temperature': response['temp'], 'current_delay': delay, 
-    'humidity': response['humidity'], 'lighting_state': response['current_status']['landscape'],}, 201)
+    # config = configparser.ConfigParser()
+    # config.read_file(open(f'{DIRECTORY}/delay_time.conf'))
+    # delay = config.get('DelayDatetime', 'value')
+    return make_response({'temperature': response['temp'], 
+    'humidity': response['humidity'], 'lighting_state': response['current_status']['landscape'],}, 200)
 
 @api_bp.route('/record-landscape-change', methods=['POST'])
 def record_landscape_change():
+    """Makes new entry in the database to update the lighting status
+    Note: Requires a state_change boolean"""
     body = request.get_json()
     strtime = datetime.strftime(datetime.today(), '%Y-%m-%d %H:%M:%S')
     last_entry = LightingStatus.query.order_by(LightingStatus.time.desc()).first()
@@ -188,6 +190,7 @@ def set_bedtime():
                                 "command": 'off'}]}
     requests.post(f"{SMARTTHINGS_DEVICES_URL}/{SMARTTHINGS_DEVICES['Bedroom']}/commands", headers=headers, json=params)
     requests.post(f"{SMARTTHINGS_DEVICES_URL}/{SMARTTHINGS_DEVICES['Pineapple']}/commands", headers=headers, json=params)
+    requests.post(f"{SMARTTHINGS_DEVICES_URL}/{SMARTTHINGS_DEVICES['Lantern']}/commands", headers=headers, json=params)
     new_bedtime = Bedtime(time=datetime.now())
     db.session.add(new_bedtime)
     db.session.commit()

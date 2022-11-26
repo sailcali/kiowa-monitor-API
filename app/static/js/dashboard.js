@@ -33,7 +33,7 @@ const venstarModeSetting = () => {
 
     // Do not display heat modes in summer / cool modes in winter
     const current_month = new Date().getMonth()
-    if (current_month > 3 & current_month < 11) {
+    if (current_month > 2 && current_month < 10) {
         for (let element of document.getElementsByClassName("summer")){
             element.style.display="flex";
          }
@@ -42,7 +42,6 @@ const venstarModeSetting = () => {
             element.style.display="flex";
          }
     };
-    
 };
 
 const changeDateHref = () => {
@@ -51,15 +50,9 @@ const changeDateHref = () => {
     link.setAttribute('href', "/temps/"+dateInput);
 }
 const adjustLandscapeLighting = () => {
-    const newDelay = document.getElementById("delayDateTime")
-    var delay = 0
-    if (newDelay.value != '') {
-        delay = newDelay.value
-    }
     if (data.landscape_state === 'ON') {
         axios.post('landscape/change-state', {
-            state: 0,
-            delay_time: delay
+            state: 0
           })
           .then(function (response) {
             location.reload()
@@ -71,8 +64,7 @@ const adjustLandscapeLighting = () => {
           });
         } else {
             axios.post('landscape/change-state', {
-            state: 1,
-            delay_time: delay
+            state: 1
           })
           .then(function (response) {
             location.reload()
@@ -88,28 +80,18 @@ const adjustLandscapeLighting = () => {
 const getGarageData = () => {
     axios.get('api/garage-status')
     .then((response) => {
-        const current_date = new Date()
-        const delay_date = new Date(response.data['current_delay'])
         const garageTempElement = document.getElementById("garageTemperature");
-        const landscapeStateElement = document.getElementById("landscapeState");
-        const landscapeDelayElement = document.getElementById("landscapeDelaySetTime");
         const slider = document.getElementById("landscapeLightSwitch");
         garageTempElement.innerHTML = "Garage Temp: " + parseInt(response.data['temperature']) + "*F";
         
         if (response.data['lighting_state'] == 1) {
-            landscapeStateElement.innerHTML = "Landscape Lighting: ON"
             slider.checked = true
         } else {
-            landscapeStateElement.innerHTML = "Landscape Lighting: OFF"
             slider.checked = false
         }
-
-        if (delay_date > current_date) {
-            landscapeDelayElement.innerHTML = "Delay Set Time: " + response.data['current_delay'];
-            landscapeDelayElement.style.display="flex";
-        }
+        var labelName = document.getElementById('landscapelightsLabel');
+        labelName.classList.remove("crossedOutLabel");
         addLandscapeListener();
-        
     })
 }
 

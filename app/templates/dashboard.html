@@ -101,63 +101,55 @@
             <p>Outside Temp: {{data.outside_temp}}*F</p>
             <p>Living Room Humidity: {{data.humidity}}%</p>
         </section>
-        <!-- <section id="usageContainer" class="container">
-            <h1>Thermostat Use</h1>
-            <p class='winter'>Heat Time Today: {{data.heat_time}} minutes</p>
-            <p class='summer'>Cool Time Today: {{data.cool_time}} minutes</p>
-        </section> -->
-        <section id="lightingContainer" class="container">
-            <h1>Landscape Lighting Status</h1>
-            <p id="landscapeState">Landscape Lighting: {{data.landscape_state}}</p>
-            <p>At time: {{data.last_landscape_change}}</p>
-            <p id="landscapeDelaySetTime">Delay Set Time: No Data</p>
-            <div id="landscapeDelaySelector">
-                <p>Set new delay (minutes): </p>
-                <input id="delayDateTime"></input>
-                
-            </div>
-            <label class="switch">
-                <input id='landscapeLightSwitch' type="checkbox">
-                <span class="slider round"></span>
-            </label>
-        </section>
         <section id="smartThingsContainer" class="container">
             <h1>Kiowa Lighting Status</h1>
-            <label id="pineappleLabel" class="crossedOutLabel">Pineapple</label>
-            <label class="switch">
-                <input id='pineappleSwitch' type="checkbox">
-                <span class="slider round"></span>
-            </label>
-            <label id="diningroomLabel" class="crossedOutLabel">Dining Room</label>
-            <label class="switch">
-                <input id='diningroomSwitch' type="checkbox">
-                <span class="slider round"></span>
-            </label>
-            <label id="frontdoorLabel" class="crossedOutLabel">Front Door</label>
-            <label class="switch">
-                <input id='frontdoorSwitch' type="checkbox">
-                <span class="slider round"></span>
-            </label>
-            <label id="garageLabel" class="crossedOutLabel">Garage</label>
-            <label class="switch">
-                <input id='garageSwitch' type="checkbox">
-                <span class="slider round"></span>
-            </label>
-            <label id="bedroomLabel" class="crossedOutLabel">Bedroom</label>
-            <label class="switch">
-                <input id='bedroomSwitch' type="checkbox">
-                <span class="slider round"></span>
-            </label>
-            <label id="lanternLabel" class="crossedOutLabel">Lantern</label>
-            <label class="switch">
-                <input id='lanternSwitch' type="checkbox">
-                <span class="slider round"></span>
-            </label>
-            <label id="stringlightsLabel" class="crossedOutLabel">String Lights</label>
-            <label class="switch">
-                <input id='stringlightsSwitch' type="checkbox">
-                <span class="slider round"></span>
-            </label>
+            <section id="allLightsContainer">
+                <section class="container lightingContainer">
+                    <label id="pineappleLabel" class="crossedOutLabel">Pineapple</label>
+                    <label class="switch">
+                        <input id='pineappleSwitch' type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                    <label id="diningroomLabel" class="crossedOutLabel">Dining Room</label>
+                    <label class="switch">
+                        <input id='diningroomSwitch' type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                    <label id="frontdoorLabel" class="crossedOutLabel">Front Door</label>
+                    <label class="switch">
+                        <input id='frontdoorSwitch' type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                    <label id="bedroomLabel" class="crossedOutLabel">Bedroom</label>
+                    <label class="switch">
+                        <input id='bedroomSwitch' type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </section>
+                <section class="container lightingContainer">
+                    <label id="garageLabel" class="crossedOutLabel">Garage</label>
+                    <label class="switch">
+                        <input id='garageSwitch' type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                    <label id="lanternLabel" class="crossedOutLabel">Christmas Tree</label>
+                    <label class="switch">
+                        <input id='lanternSwitch' type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                    <label id="stringlightsLabel" class="crossedOutLabel">String Lights</label>
+                    <label class="switch">
+                        <input id='stringlightsSwitch' type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                    <label id="landscapelightsLabel" class="crossedOutLabel">Landscape Lights</label>
+                    <label class="switch">
+                        <input id='landscapeLightSwitch' type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </section>
+            </section>
+            
         </section>
         <section id="bedtimeContainer" class="container">
             <h1>Bedtime Data</h1>
