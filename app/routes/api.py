@@ -7,7 +7,7 @@ from datetime import datetime, date
 import requests
 from dotenv import load_dotenv
 import os
-from smartthings import SMARTTHINGS_DEVICES
+from smartthings import SMARTTHINGS_DEVICES, SMARTTHINGS_NAMES
 import configparser
 
 load_dotenv()
@@ -23,6 +23,7 @@ GARAGE_PI_STATUS_URL = 'http://' + PI_ZERO_IP + '/get-status'
 SMARTTHINGS_DEVICES_URL = 'https://api.smartthings.com/v1/devices'
 GARAGE_PICO_URL = 'http://192.168.86.33'
 WEATHER_APP_ID = os.environ.get("WEATHER_APP_ID")
+LIGHTING_STATES = {'on': True, 'off': False}
 
 api_bp = Blueprint('api_bp', __name__, url_prefix='/api')
 
@@ -38,6 +39,47 @@ def return_api_docs():
                     '/solar-production/period-sum': "Returns solar production data as a sum during a specified period. Requires 'start_date' and 'end_date' as YYYY-MM-DD.",
                     '/solar-production/period/data': "Returns all known production data over a period from database as JSON. Requires 'start_date' and 'end_date' as YYYY-MM-DD."})
 
+@api_bp.route("/venstar-status", methods=["GET"])
+def return_current_venstar_status():
+    # Transfer Values
+    # Change lighting bool to ON or OFF
+    lighting_bool = {1: 'ON', 0: 'OFF'}
+    # Change mode data (0,1,2,3) to understandable strings
+    venstar_modes = {0: 'OFF', 1: 'HEAT', 2: 'COOL', 3: 'AUTO'}
+    # Change fan state to ON or AUTO
+    fan_states = {0: 'AUTO', 1: 'ON'}
+    
+    try:
+        info_response = requests.get(VENSTAR_INFO_URL)
+        info = info_response.json()
+        sensor_response = requests.get(VENSTAR_SENSOR_URL)
+        sensors = sensor_response.json()
+        runtime_response = requests.get(VENSTAR_RUNTIMES_URL)
+        runtimes = runtime_response.json()
+    except requests.exceptions.RequestException as e:
+        print(e)
+    else:
+        # Set remote temperature (outdoor)
+        for sensor in sensors['sensors']:
+            if sensor['name'] == 'Remote':
+                remote_temp = int(sensor['temp'])
+
+        # Collect and transpose real-time data
+        heat_time = runtimes['runtimes'][-1]['heat1']
+        cool_time = runtimes['runtimes'][-1]['cool1']
+        fan_setting = fan_states[info['fan']]
+        venstar_mode = venstar_modes[info['mode']]
+        heat_setting = int(info['heattemp'])
+        cool_setting = int(info['cooltemp'])
+        therm_temp = int(info['spacetemp'])
+        
+    finally:
+        # Collect final into dictionary for transfer
+        data = {'current_temp': therm_temp, 'outside_temp': remote_temp, 
+                'heat_temp': heat_setting, 'cool_temp': cool_setting,
+                'mode': venstar_mode, 'fan_setting': fan_setting, 'heat_time': heat_time, 
+                'cool_time': cool_time}
+    return jsonify(data)
 
 @api_bp.route("/temps", methods=["GET"])
 def return_temps_for_api():
@@ -72,8 +114,11 @@ def return_current_temps_for_api():
     living_room = temps.pi_temp
     venstar_response = requests.get(VENSTAR_INFO_URL)
     venstar_info = venstar_response.json()
+    response = requests.get(GARAGE_PICO_URL)
+    garage_response = response.json()
     hum = temps.humidity
-    return jsonify({'thermostat_temp': venstar_info['spacetemp'], 'living_room_temp': living_room, 'humidity': hum, 'remote_temp': temps.remote_temp}), 200
+    return jsonify({'thermostat': venstar_info['spacetemp'], 'living_room': living_room, 'living_room_humidity': hum, 
+                    'outside': temps.remote_temp, "garage": int(garage_response["temp"])}), 200
 
 @api_bp.route('/garage-status', methods=['GET'])
 def get_garage_status():
@@ -81,10 +126,6 @@ def get_garage_status():
     if response.status_code != 200:
         return make_response({'Status': 'No connection to Garage PICO'}, 401)
     response = response.json()
-    # last_entry = LightingStatus.query.order_by(LightingStatus.time.desc()).first()
-    # config = configparser.ConfigParser()
-    # config.read_file(open(f'{DIRECTORY}/delay_time.conf'))
-    # delay = config.get('DelayDatetime', 'value')
     return make_response({'temperature': response['temp'], 
     'humidity': response['humidity'], 'lighting_state': response['current_status']['landscape'],}, 200)
 
@@ -110,11 +151,15 @@ def food_tables():
     db.session.commit()
     return redirect(url_for('food_bp.get_food_schedule'))
 
-@api_bp.route('/smartthings/status', methods=['GET', 'POST'])
+@api_bp.route('/lighting/status', methods=['GET', 'POST'])
 def interact_smartthings():
     headers = {"Authorization": "Bearer " + SMARTTHINGS_TOKEN}
     if request.method == 'GET':
-        states = {"devices": []}
+        states = {"devices": {}}
+
+        result = requests.get(GARAGE_PICO_URL)
+        garage_response = result.json()
+
         for device, id in SMARTTHINGS_DEVICES.items():
             status_response = requests.get(f'{SMARTTHINGS_DEVICES_URL}/{id}/status', headers=headers)
             if status_response.status_code == 400:
@@ -125,10 +170,15 @@ def interact_smartthings():
             device_state = status_response.json()
             device_health = health_response.json()
             if device_health['state'] == 'OFFLINE':
-                states['devices'].append({"name": device, 'state': 'OFFLINE'})
+                states['devices'][SMARTTHINGS_NAMES[device]] = None
             else:
-                states['devices'].append({"name": device, 'state': device_state['components']['main']['switch']['switch']['value']})
+                states['devices'][SMARTTHINGS_NAMES[device]] = LIGHTING_STATES[device_state['components']['main']['switch']['switch']['value']]
+        if garage_response['current_status']['landscape'] == 1:
+            states['devices']["landscape"] = True
+        else:
+            states['devices']["landscape"] = False
         return jsonify(states)
+
     if request.method == 'POST':
         data = request.get_json()
         new_state = ''
