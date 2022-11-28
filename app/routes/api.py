@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 import os
 from smartthings import SMARTTHINGS_DEVICES, SMARTTHINGS_NAMES
 import configparser
+from .landscape import landscape
 
 load_dotenv()
 SMARTTHINGS_TOKEN = os.environ.get("SMARTTHINGS_TOKEN")
@@ -39,47 +40,62 @@ def return_api_docs():
                     '/solar-production/period-sum': "Returns solar production data as a sum during a specified period. Requires 'start_date' and 'end_date' as YYYY-MM-DD.",
                     '/solar-production/period/data': "Returns all known production data over a period from database as JSON. Requires 'start_date' and 'end_date' as YYYY-MM-DD."})
 
-@api_bp.route("/venstar-status", methods=["GET"])
-def return_current_venstar_status():
-    # Transfer Values
-    # Change lighting bool to ON or OFF
-    lighting_bool = {1: 'ON', 0: 'OFF'}
-    # Change mode data (0,1,2,3) to understandable strings
-    venstar_modes = {0: 'OFF', 1: 'HEAT', 2: 'COOL', 3: 'AUTO'}
-    # Change fan state to ON or AUTO
-    fan_states = {0: 'AUTO', 1: 'ON'}
-    
-    try:
-        info_response = requests.get(VENSTAR_INFO_URL)
-        info = info_response.json()
-        sensor_response = requests.get(VENSTAR_SENSOR_URL)
-        sensors = sensor_response.json()
-        runtime_response = requests.get(VENSTAR_RUNTIMES_URL)
-        runtimes = runtime_response.json()
-    except requests.exceptions.RequestException as e:
-        print(e)
-    else:
-        # Set remote temperature (outdoor)
-        for sensor in sensors['sensors']:
-            if sensor['name'] == 'Remote':
-                remote_temp = int(sensor['temp'])
-
-        # Collect and transpose real-time data
-        heat_time = runtimes['runtimes'][-1]['heat1']
-        cool_time = runtimes['runtimes'][-1]['cool1']
-        fan_setting = fan_states[info['fan']]
-        venstar_mode = venstar_modes[info['mode']]
-        heat_setting = int(info['heattemp'])
-        cool_setting = int(info['cooltemp'])
-        therm_temp = int(info['spacetemp'])
+@api_bp.route("/venstar-status", methods=["GET", "POST"])
+def interact_with_venstar():
+    if request.method == 'GET':
+        # Transfer Values
+        # Change lighting bool to ON or OFF
+        lighting_bool = {1: 'ON', 0: 'OFF'}
+        # Change mode data (0,1,2,3) to understandable strings
+        venstar_modes = {0: 'OFF', 1: 'HEAT', 2: 'COOL', 3: 'AUTO'}
+        # Change fan state to ON or AUTO
+        fan_states = {0: 'AUTO', 1: 'ON'}
         
-    finally:
-        # Collect final into dictionary for transfer
-        data = {'current_temp': therm_temp, 'outside_temp': remote_temp, 
-                'heat_temp': heat_setting, 'cool_temp': cool_setting,
-                'mode': venstar_mode, 'fan_setting': fan_setting, 'heat_time': heat_time, 
-                'cool_time': cool_time}
-    return jsonify(data)
+        try:
+            info_response = requests.get(VENSTAR_INFO_URL)
+            info = info_response.json()
+            sensor_response = requests.get(VENSTAR_SENSOR_URL)
+            sensors = sensor_response.json()
+            runtime_response = requests.get(VENSTAR_RUNTIMES_URL)
+            runtimes = runtime_response.json()
+        except requests.exceptions.RequestException as e:
+            print(e)
+        else:
+            # Set remote temperature (outdoor)
+            for sensor in sensors['sensors']:
+                if sensor['name'] == 'Remote':
+                    remote_temp = int(sensor['temp'])
+
+            # Collect and transpose real-time data
+            heat_time = runtimes['runtimes'][-1]['heat1']
+            cool_time = runtimes['runtimes'][-1]['cool1']
+            fan_setting = fan_states[info['fan']]
+            venstar_mode = venstar_modes[info['mode']]
+            heat_setting = int(info['heattemp'])
+            cool_setting = int(info['cooltemp'])
+            therm_temp = int(info['spacetemp'])
+            
+        finally:
+            # Collect final into dictionary for transfer
+            data = {'current_temp': therm_temp, 'outside_temp': remote_temp, 
+                    'heat_temp': heat_setting, 'cool_temp': cool_setting,
+                    'mode': venstar_mode, 'fan_setting': fan_setting, 'heat_time': heat_time, 
+                    'cool_time': cool_time}
+        return jsonify(data)
+    else:
+        # Change mode data (0,1,2,3) to understandable strings
+        venstar_modes = {'OFF': 0, 'HEAT': 1, 'COOL': 2, 'AUTO': 3}
+        # Change fan state to ON or AUTO
+        fan_states = {'AUTO': 0, 'ON': 1}
+        data = request.get_json()
+        params = {
+            'mode': venstar_modes[data["mode"]],
+            'fan': fan_states[data['fan_setting']],
+            'heattemp': data['heat_temp'],
+            'cooltemp': data['cool_temp']
+        }
+        requests.post(VENSTAR_CONTROL_URL, params=params)
+        return jsonify([]), 201
 
 @api_bp.route("/temps", methods=["GET"])
 def return_temps_for_api():
@@ -183,48 +199,54 @@ def interact_smartthings():
         data = request.get_json()
         new_state = ''
         device = ''
-        if data['light'] == 'pineappleSwitch':
+        if data['light'] == 'pineapple':
             device = 'Pineapple'
             if data['state']:
                 new_state = 'on'
             else:
                 new_state = 'off'
-        elif data['light'] == 'diningroomSwitch':
+        elif data['light'] == 'diningRoom':
             device = 'Dining Room'
             if data['state']:
                 new_state = 'on'
             else:
                 new_state = 'off'
-        elif data['light'] == 'garageSwitch':
+        elif data['light'] == 'garage':
             device = 'Garage'
             if data['state']:
                 new_state = 'on'
             else:
                 new_state = 'off'
-        elif data['light'] == 'bedroomSwitch':
+        elif data['light'] == 'bedroom':
             device = 'Bedroom'
             if data['state']:
                 new_state = 'on'
             else:
                 new_state = 'off'
-        elif data['light'] == 'lanternSwitch':
+        elif data['light'] == 'lantern':
             device = 'Lantern'
             if data['state']:
                 new_state = 'on'
             else:
                 new_state = 'off'
-        elif data['light'] == 'stringlightsSwitch':
+        elif data['light'] == 'string':
             device = 'String Lights'
             if data['state']:
                 new_state = 'on'
             else:
                 new_state = 'off'
-        elif data['light'] == 'frontdoorSwitch':
+        elif data['light'] == 'frontDoor':
             device = 'Front Door'
             if data['state']:
                 new_state = 'on'
             else:
                 new_state = 'off'
+        elif data['light'] == 'landscape':
+            if data['state']:
+                landscape.change_landscape(1)
+            else:
+                landscape.change_landscape(0)
+            return jsonify([])
         params = {'commands': [{"component": 'main',
                                 "capability": 'switch',
                                 "command": new_state}]}
