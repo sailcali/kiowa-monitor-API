@@ -11,7 +11,7 @@ load_dotenv()
 
 
 def create_app(test_config=None):
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder='build', static_url_path='/')
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     CORS(app)
     

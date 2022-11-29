@@ -3,12 +3,11 @@ from flask import Blueprint, jsonify, make_response, request, redirect, url_for
 import sqlalchemy
 from app import db
 from app.models import EnphaseProduction, LightingStatus, VenstarTemp, Food, Bedtime
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import requests
 from dotenv import load_dotenv
 import os
 from smartthings import SMARTTHINGS_DEVICES, SMARTTHINGS_NAMES
-import configparser
 from .landscape import landscape
 
 load_dotenv()
@@ -30,22 +29,27 @@ api_bp = Blueprint('api_bp', __name__, url_prefix='/api')
 
 @api_bp.route("", methods=['GET'])
 def return_api_docs():
-    return jsonify({'/temps': 'Returns the temperature data from today as JSON', 
+    return jsonify({'venstar-status': 'Get and Set the current status of venstar ecosystem',
+                    '/temps': 'Returns the temperature data from today as JSON', 
+                    '/temps/<requested_date>': 'Returns the temperature data from a date as JSON',
                     '/current_temps': 'Returns current temperatures as JSON',
+                    '/venstar-usage': 'Returns the temps and venstar usage data from today',
+                    '/venstar-usage/<requested_date>': 'Returns the temps and venstar usage data from a date',
                     '/garage-status': 'Returns garage PICO status (temperature and lighting) as JSON',
                     '/record-landscape-change': "Records landscape lighting changes in database (requires boolean 'state_change')",
                     '/food': 'Records new food item in database for food tracker',
-                    '/smartthings/status': 'Returns SmartThings devices states as JSON',
+                    '/lighting/status': 'Returns SmartThings and Garage devices states as JSON',
+                    '/bedtime': 'Get and Set bedtime lights and time',
                     '/solar-production/lifetime': 'Returns all known production data from database as JSON.',
                     '/solar-production/period-sum': "Returns solar production data as a sum during a specified period. Requires 'start_date' and 'end_date' as YYYY-MM-DD.",
-                    '/solar-production/period/data': "Returns all known production data over a period from database as JSON. Requires 'start_date' and 'end_date' as YYYY-MM-DD."})
+                    '/solar-production/period/data': "Returns all known production data over a period from database as JSON. Requires 'start_date' and 'end_date' as YYYY-MM-DD.",
+                    '/weather/outlook': 'Returns JSON of weather data for 5 days'})
 
 @api_bp.route("/venstar-status", methods=["GET", "POST"])
 def interact_with_venstar():
+    """Get the current status of venstar ecosystem, Change the current status of venstar ecosystem"""
     if request.method == 'GET':
         # Transfer Values
-        # Change lighting bool to ON or OFF
-        lighting_bool = {1: 'ON', 0: 'OFF'}
         # Change mode data (0,1,2,3) to understandable strings
         venstar_modes = {0: 'OFF', 1: 'HEAT', 2: 'COOL', 3: 'AUTO'}
         # Change fan state to ON or AUTO
@@ -97,6 +101,44 @@ def interact_with_venstar():
         requests.post(VENSTAR_CONTROL_URL, params=params)
         return jsonify([]), 201
 
+@api_bp.route("/temps/<requested_date>", methods=["GET"])
+def display_temps_by_date(requested_date):
+    """Returns a JSON of temperatures from a given date"""
+    try:
+        start_date = datetime.strptime(requested_date, '%Y-%m-%d')
+    except ValueError:
+        try:
+            start_date = datetime.strptime(requested_date, '%Y-%b-%d')
+        except ValueError:
+            return make_response({}, 404)
+    end_time = start_date + timedelta(days=1)
+    temps = VenstarTemp.query.filter(VenstarTemp.time>start_date, VenstarTemp.time<end_time).order_by(VenstarTemp.time.desc()).all()
+    data = {'data': []}
+    if start_date < datetime.strptime('2021-12-05', '%Y-%m-%d'):
+        for i in range(len(temps)):
+        
+            data['data'].append({'time': datetime.strftime(temps[i].time, '%Y-%b-%d %H:%M'),
+                        'local_temp': temps[i].local_temp,
+                        'pi_temp': temps[i].pi_temp,
+                        'remote_temp': temps[i].remote_temp,
+                        'humidity': temps[i].humidity})
+    else:
+        for i in range(len(temps)):
+            if i > 0:
+                last_heat_time = temps[i-1].heat_runtime
+                last_cool_time = temps[i-1].cool_runtime
+            else:
+                last_heat_time = 0
+                last_cool_time = 0
+            data['data'].append({'time': datetime.strftime(temps[i].time, '%Y-%b-%d %H:%M'),
+                        'local_temp': temps[i].local_temp,
+                        'pi_temp': temps[i].pi_temp,
+                        'remote_temp': temps[i].remote_temp,
+                        'humidity': temps[i].humidity,
+                        'heat_time': temps[i].heat_runtime - last_heat_time,
+                        'cool_time': temps[i].cool_runtime - last_cool_time})
+    return make_response(data, 200)
+
 @api_bp.route("/temps", methods=["GET"])
 def return_temps_for_api():
     """API call for today's temps"""
@@ -127,14 +169,68 @@ def return_temps_for_api():
 def return_current_temps_for_api():
     """Returns a JSON of the current temperatures onboard the server"""
     temps = VenstarTemp.query.order_by(VenstarTemp.time.desc()).first()
-    living_room = temps.pi_temp
     venstar_response = requests.get(VENSTAR_INFO_URL)
     venstar_info = venstar_response.json()
     response = requests.get(GARAGE_PICO_URL)
     garage_response = response.json()
     hum = temps.humidity
-    return jsonify({'thermostat': venstar_info['spacetemp'], 'living_room': living_room, 'living_room_humidity': hum, 
+    return jsonify({'thermostat': venstar_info['spacetemp'], 'living_room': temps.pi_temp, 'living_room_humidity': hum, 
                     'outside': temps.remote_temp, "garage": int(garage_response["temp"])}), 200
+
+@api_bp.route('/venstar-usage', methods=['GET'])
+def return_usage_from_today():
+    """Returns dataset of today's venstar usage data"""
+    start_date = date.today()
+    start_time = datetime.combine(start_date, datetime.min.time())
+
+    temps = VenstarTemp.query.filter(VenstarTemp.time>start_time).order_by(VenstarTemp.time.desc()).all()
+    data = {'data': []}
+    for i in range(len(temps)):
+        if i != len(temps)-1:
+            last_heat_time = temps[i+1].heat_runtime
+            last_cool_time = temps[i+1].cool_runtime
+        else:
+            last_heat_time = 0
+            last_cool_time = 0
+        data['data'].append({'time': datetime.strftime(temps[i].time, '%Y-%b-%d %H:%M'),
+                     'local_temp': temps[i].local_temp,
+                     'pi_temp': temps[i].pi_temp,
+                     'remote_temp': temps[i].remote_temp,
+                     'humidity': temps[i].humidity,
+                     'heat_time': temps[i].heat_runtime - last_heat_time,
+                     'cool_time': temps[i].cool_runtime - last_cool_time})
+    return make_response(data, 200)
+
+@api_bp.route('/venstar-usage/<requested_date>', methods=['GET'])
+def return_usage_from_date(requested_date):
+    """Returns dataset of requested days venstar usage data"""
+    try:
+        start_date = datetime.strptime(requested_date, '%Y-%m-%d')
+    except ValueError:
+        try:
+            start_date = datetime.strptime(requested_date, '%Y-%b-%d')
+        except ValueError:
+            return make_response({}, 404)
+    end_time = start_date + timedelta(days=1)
+
+    temps = VenstarTemp.query.filter(VenstarTemp.time>start_date, VenstarTemp.time<end_time).order_by(VenstarTemp.time.desc()).all()
+
+    data = {'data': []}
+    for i in range(len(temps)):
+        if i != len(temps)-1:
+            last_heat_time = temps[i+1].heat_runtime
+            last_cool_time = temps[i+1].cool_runtime
+        else:
+            last_heat_time = 0
+            last_cool_time = 0
+        data['data'].append({'time': datetime.strftime(temps[i].time, '%Y-%b-%d %H:%M'),
+                     'local_temp': temps[i].local_temp,
+                     'pi_temp': temps[i].pi_temp,
+                     'remote_temp': temps[i].remote_temp,
+                     'humidity': temps[i].humidity,
+                     'heat_time': temps[i].heat_runtime - last_heat_time,
+                     'cool_time': temps[i].cool_runtime - last_cool_time})
+    return make_response(data, 200)
 
 @api_bp.route('/garage-status', methods=['GET'])
 def get_garage_status():
@@ -254,19 +350,32 @@ def interact_smartthings():
         
         return jsonify([])
 
-@api_bp.route('/bedtime', methods=['GET'])
-def set_bedtime():
-    headers = {"Authorization": "Bearer " + SMARTTHINGS_TOKEN}
-    params = {'commands': [{"component": 'main',
-                                "capability": 'switch',
-                                "command": 'off'}]}
-    requests.post(f"{SMARTTHINGS_DEVICES_URL}/{SMARTTHINGS_DEVICES['Bedroom']}/commands", headers=headers, json=params)
-    requests.post(f"{SMARTTHINGS_DEVICES_URL}/{SMARTTHINGS_DEVICES['Pineapple']}/commands", headers=headers, json=params)
-    requests.post(f"{SMARTTHINGS_DEVICES_URL}/{SMARTTHINGS_DEVICES['Lantern']}/commands", headers=headers, json=params)
-    new_bedtime = Bedtime(time=datetime.now())
-    db.session.add(new_bedtime)
-    db.session.commit()
-    return redirect(url_for('venstar_bp.kiowa_dashboard'))
+@api_bp.route('/bedtime', methods=['GET', "POST"])
+def get_set_bedtime():
+    """Returns the recent bedtime data. POST will also set bedtime"""
+    if request.method == "POST":
+        headers = {"Authorization": "Bearer " + SMARTTHINGS_TOKEN}
+        params = {'commands': [{"component": 'main',
+                                    "capability": 'switch',
+                                    "command": 'off'}]}
+        requests.post(f"{SMARTTHINGS_DEVICES_URL}/{SMARTTHINGS_DEVICES['Bedroom']}/commands", headers=headers, json=params)
+        requests.post(f"{SMARTTHINGS_DEVICES_URL}/{SMARTTHINGS_DEVICES['Pineapple']}/commands", headers=headers, json=params)
+        requests.post(f"{SMARTTHINGS_DEVICES_URL}/{SMARTTHINGS_DEVICES['Lantern']}/commands", headers=headers, json=params)
+        new_bedtime = Bedtime(time=datetime.now())
+        db.session.add(new_bedtime)
+        db.session.commit()
+    
+    last_bedtime_time = "No Data"
+    today_bedtime_time = "No Data"
+    yesterday = datetime.now() - timedelta(hours=36)
+    recent = datetime.now() - timedelta(hours=8)
+    bedtime = Bedtime.query.filter(Bedtime.time>=yesterday).order_by(Bedtime.time.desc()).all()
+    for row in bedtime:
+        if row.time > recent and today_bedtime_time == "No Data":
+            today_bedtime_time = datetime.strftime(row.time, "%Y-%m-%d %I:%M %p")
+        elif row.time < recent and last_bedtime_time == "No Data":
+            last_bedtime_time = datetime.strftime(row.time, "%Y-%m-%d %I:%M %p")
+    return jsonify({"today_bedtime": today_bedtime_time, "last_bedtime": last_bedtime_time})
 
 @api_bp.route('/solar-production/lifetime', methods=['GET'])
 def get_all_solar_production():
