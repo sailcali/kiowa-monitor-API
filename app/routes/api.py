@@ -205,7 +205,7 @@ def return_current_temps_for_api():
         outdoor_temp
     except NameError:
         outdoor_temp = last_temps.remote_temp
-    return jsonify({'thermostat': thermostat_temp, 'living_room': farenheight, 'living_room_humidity': humidity, 
+    return jsonify({'thermostat': thermostat_temp, 'living_room': int(farenheight), 'living_room_humidity': int(humidity), 
                     'outside': outdoor_temp, "garage": int(garage_response["temp"])}), 200
 
 @api_bp.route('/venstar-usage', methods=['GET'])
