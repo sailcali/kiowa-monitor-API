@@ -9,6 +9,12 @@ from dotenv import load_dotenv
 import os
 from smartthings import SMARTTHINGS_DEVICES, SMARTTHINGS_NAMES
 from .landscape import landscape
+import platform
+
+if platform.system() == 'Linux':
+    from adafruit_bme280 import basic as adafruit_bme280
+    from board import D4
+    import board
 
 load_dotenv()
 SMARTTHINGS_TOKEN = os.environ.get("SMARTTHINGS_TOKEN")
@@ -168,14 +174,39 @@ def return_temps_for_api():
 @api_bp.route("/current_temps", methods=["GET"])
 def return_current_temps_for_api():
     """Returns a JSON of the current temperatures onboard the server"""
-    temps = VenstarTemp.query.order_by(VenstarTemp.time.desc()).first()
-    venstar_response = requests.get(VENSTAR_INFO_URL)
+    
+    if platform.system() == 'Linux':
+        i2c = board.I2C()
+        BME280 = adafruit_bme280.Adafruit_BME280_I2C(i2c, address=0x77)
+        farenheight = BME280.temperature * (9 / 5) + 32
+        humidity = BME280.humidity
+    else:
+        temps = VenstarTemp.query.order_by(VenstarTemp.time.desc()).first()
+        farenheight = temps.pi_temp
+        humidity = temps.humidity
+    
+    last_temps = VenstarTemp.query.order_by(VenstarTemp.time.desc()).first()
+    
+    # Get the current venstar thermostat temperature and the outdoor temp.
+    venstar_response = requests.get(VENSTAR_SENSOR_URL)
     venstar_info = venstar_response.json()
     response = requests.get(GARAGE_PICO_URL)
     garage_response = response.json()
-    hum = temps.humidity
-    return jsonify({'thermostat': venstar_info['spacetemp'], 'living_room': temps.pi_temp, 'living_room_humidity': hum, 
-                    'outside': temps.remote_temp, "garage": int(garage_response["temp"])}), 200
+    try:
+        for sensor in venstar_info['sensors']:
+            if sensor['name'] == "Space Temp":
+                thermostat_temp = sensor["temp"]
+            if sensor['name'] == "Remote":
+                outdoor_temp = sensor['temp']
+    except KeyError:
+        thermostat_temp = last_temps.local_temp
+        outdoor_temp = last_temps.remote_temp
+    try:
+        outdoor_temp
+    except NameError:
+        outdoor_temp = last_temps.remote_temp
+    return jsonify({'thermostat': thermostat_temp, 'living_room': farenheight, 'living_room_humidity': humidity, 
+                    'outside': outdoor_temp, "garage": int(garage_response["temp"])}), 200
 
 @api_bp.route('/venstar-usage', methods=['GET'])
 def return_usage_from_today():
