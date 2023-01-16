@@ -10,6 +10,7 @@ import os
 from smartthings import SMARTTHINGS_DEVICES, SMARTTHINGS_NAMES
 from .landscape import landscape
 import platform
+from discordwebhook import Discord
 
 if platform.system() == 'Linux':
     from adafruit_bme280 import basic as adafruit_bme280
@@ -30,6 +31,8 @@ SMARTTHINGS_DEVICES_URL = 'https://api.smartthings.com/v1/devices'
 GARAGE_PICO_URL = 'http://192.168.86.33'
 WEATHER_APP_ID = os.environ.get("WEATHER_APP_ID")
 LIGHTING_STATES = {'on': True, 'off': False}
+DISCORD_URL = os.environ.get("DISCORD_GENERAL_URL")
+DISCORD = Discord(url=DISCORD_URL)
 
 api_bp = Blueprint('api_bp', __name__, url_prefix='/api')
 
@@ -69,7 +72,7 @@ def interact_with_venstar():
             runtime_response = requests.get(VENSTAR_RUNTIMES_URL)
             runtimes = runtime_response.json()
         except requests.exceptions.RequestException as e:
-            print(e)
+            DISCORD.post(content=f"Problem with Venstar. Error: {e}")
         else:
             # Set remote temperature (outdoor)
             for sensor in sensors['sensors']:
@@ -406,6 +409,7 @@ def get_set_bedtime():
             today_bedtime_time = datetime.strftime(row.time, "%Y-%m-%d %I:%M %p")
         elif row.time < recent and last_bedtime_time == "No Data":
             last_bedtime_time = datetime.strftime(row.time, "%Y-%m-%d %I:%M %p")
+    DISCORD.post(content=f"Good night!")
     return jsonify({"today_bedtime": today_bedtime_time, "last_bedtime": last_bedtime_time})
 
 @api_bp.route('/solar-production/lifetime', methods=['GET'])
