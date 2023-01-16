@@ -398,6 +398,7 @@ def get_set_bedtime():
         new_bedtime = Bedtime(time=datetime.now())
         db.session.add(new_bedtime)
         db.session.commit()
+        DISCORD.post(content=f"Good night!")
     
     last_bedtime_time = "No Data"
     today_bedtime_time = "No Data"
@@ -409,7 +410,6 @@ def get_set_bedtime():
             today_bedtime_time = datetime.strftime(row.time, "%Y-%m-%d %I:%M %p")
         elif row.time < recent and last_bedtime_time == "No Data":
             last_bedtime_time = datetime.strftime(row.time, "%Y-%m-%d %I:%M %p")
-    DISCORD.post(content=f"Good night!")
     return jsonify({"today_bedtime": today_bedtime_time, "last_bedtime": last_bedtime_time})
 
 @api_bp.route('/solar-production/lifetime', methods=['GET'])
