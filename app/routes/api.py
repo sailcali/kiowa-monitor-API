@@ -170,7 +170,7 @@ def return_temps_for_api():
                      'humidity': temps[i].humidity,
                      'heat_time': temps[i].heat_runtime - last_heat_time,
                      'cool_time': temps[i].cool_runtime - last_cool_time,
-                     "pressure": round(temps[i].pressure, 1)})
+                     "pressure": temps[i].pressure})
     response = make_response(data)
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
