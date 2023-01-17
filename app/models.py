@@ -48,3 +48,17 @@ class Bedtime(db.Model):
     __tablename__ = 'bedtime'
     id = db.Column(db.SmallInteger, primary_key=True, autoincrement=True)
     time = db.Column(db.DateTime)
+
+class DoorStatus(db.Model):
+    __tablename__ = 'door_status'
+    name = db.Column(db.String, primary_key=True)
+    state = db.Column(db.Boolean, nullable=False)
+    timestamp = db.Column(db.BigInteger)
+
+class SDAccess(db.Model):
+    __tablename__ = 'sd_access'
+    user = db.Column(db.String, primary_key=True)
+    at = db.Column(db.String)
+    rt = db.Column(db.Text)
+    acdate = db.Column(db.DateTime(timezone=True))
+    rfdate = db.Column(db.DateTime(timezone=True))
