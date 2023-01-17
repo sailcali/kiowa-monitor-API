@@ -183,7 +183,7 @@ def return_current_temps_for_api():
         BME280 = adafruit_bme280.Adafruit_BME280_I2C(i2c, address=0x77)
         farenheight = BME280.temperature * (9 / 5) + 32
         humidity = BME280.humidity
-        pressure = BME280.pressure
+        pressure = round(BME280.pressure,1)
     else:
         temps = VenstarTemp.query.order_by(VenstarTemp.time.desc()).first()
         farenheight = temps.pi_temp
