@@ -183,10 +183,12 @@ def return_current_temps_for_api():
         BME280 = adafruit_bme280.Adafruit_BME280_I2C(i2c, address=0x77)
         farenheight = BME280.temperature * (9 / 5) + 32
         humidity = BME280.humidity
+        pressure = BME280.pressure
     else:
         temps = VenstarTemp.query.order_by(VenstarTemp.time.desc()).first()
         farenheight = temps.pi_temp
         humidity = temps.humidity
+        pressure = None
     
     last_temps = VenstarTemp.query.order_by(VenstarTemp.time.desc()).first()
     
@@ -208,7 +210,7 @@ def return_current_temps_for_api():
         outdoor_temp
     except NameError:
         outdoor_temp = last_temps.remote_temp
-    return jsonify({'thermostat': thermostat_temp, 'living_room': int(farenheight), 'living_room_humidity': int(humidity), 
+    return jsonify({'pressure': pressure, 'thermostat': thermostat_temp, 'living_room': int(farenheight), 'living_room_humidity': int(humidity), 
                     'outside': outdoor_temp, "garage": int(garage_response["temp"])}), 200
 
 @api_bp.route('/venstar-usage', methods=['GET'])
