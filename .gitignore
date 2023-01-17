@@ -5,6 +5,7 @@
 .DS_Store
 smartthings.py
 /local_migrations
+backup.gz
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

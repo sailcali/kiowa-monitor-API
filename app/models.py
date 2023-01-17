@@ -10,6 +10,7 @@ class VenstarTemp(db.Model):
     pi_temp = db.Column(db.SmallInteger, nullable=True)
     heat_runtime = db.Column(db.SmallInteger)
     cool_runtime = db.Column(db.SmallInteger)
+    pressure = db.Column(db.Float)
 
 class EnphaseProduction(db.Model):
     __tablename__ = 'enphase_production'
