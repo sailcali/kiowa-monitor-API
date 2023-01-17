@@ -163,6 +163,10 @@ def return_temps_for_api():
         else:
             last_heat_time = 0
             last_cool_time = 0
+        if temps[i].pressure:
+            pressure = round(temps[i].pressure,1)
+        else:
+            pressure = "N/A"
         data['data'].append({'time': datetime.strftime(temps[i].time, '%Y-%b-%d %H:%M'),
                      'local_temp': temps[i].local_temp,
                      'pi_temp': temps[i].pi_temp,
@@ -170,7 +174,7 @@ def return_temps_for_api():
                      'humidity': temps[i].humidity,
                      'heat_time': temps[i].heat_runtime - last_heat_time,
                      'cool_time': temps[i].cool_runtime - last_cool_time,
-                     "pressure": temps[i].pressure})
+                     "pressure": pressure})
     response = make_response(data)
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
