@@ -6,8 +6,15 @@ import pytz
 from astral.geocoder import database, lookup
 from datetime import datetime, timedelta
 import requests
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 CRON_PERIOD = 6
+GARAGE_IP = os.environ.get("GARAGE_PI_IP")
+GARAGE_PI_STATUS_URL = 'http://' + GARAGE_IP + '/get-status'
+GARAGE_PI_LIGHTS_URL = 'http://' + GARAGE_IP + '/lights'
 
 def change_landscape(on_off=3, delay_request=False):
     """Algorithm for deciding state of landscape lighting.
@@ -29,7 +36,7 @@ def change_landscape(on_off=3, delay_request=False):
     sunset_over = sunset_over.astimezone(tz=pytz.timezone("US/Pacific"))
 
     # Get the current settings from PICO
-    response = requests.get('http://192.168.86.33/get-status')
+    response = requests.get(GARAGE_PI_STATUS_URL)
     if response.status_code != 404:
         current_status = int(response.json()['current_status']['landscape'])
         
@@ -37,11 +44,11 @@ def change_landscape(on_off=3, delay_request=False):
         # Send code to PICO to adjust landscape
         # Add state to data
         if on_off == 0 and current_status == 1:
-            response = requests.get('http://192.168.86.33/lights/off')
+            response = requests.get(GARAGE_PI_LIGHTS_URL + '/off')
             if response.json()['current_status']['landscape'] == 0:
                 state_change = False
         elif on_off == 1 and current_status == 0:
-            response = requests.get('http://192.168.86.33/lights/on')
+            response = requests.get(GARAGE_PI_LIGHTS_URL + '/on')
             if response.json()['current_status']['landscape'] == 1:
                 state_change = True
 
@@ -49,13 +56,13 @@ def change_landscape(on_off=3, delay_request=False):
         if current_status == 0 and \
             sunset_over.time() > datetime.now().time() and \
                 sunset.time() < datetime.now().time():
-            response = requests.get('http://192.168.86.33/lights/on')
+            response = requests.get(GARAGE_PI_LIGHTS_URL + '/on')
             if response.json()['current_status']['landscape'] == 1:
                 state_change = True
         
         # If its midnight turn the landscape lights off
         if current_status == 1 and datetime.now().hour == 0:
-            response = requests.get('http://192.168.86.33/lights/off')
+            response = requests.get(GARAGE_PI_LIGHTS_URL + '/off')
             if response.json()['current_status']['landscape'] == 0:
                 state_change = False
             
