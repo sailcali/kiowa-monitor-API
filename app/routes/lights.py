@@ -3,6 +3,7 @@ from flask import Blueprint, jsonify, request
 from app import db
 import requests
 import os
+import json
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 from discordwebhook import Discord
@@ -23,7 +24,7 @@ SMARTTHINGS_DEVICES_URL = 'https://api.smartthings.com/v1/devices'
 LIGHTING_STATES = {'on': True, 'off': False}
 DISCORD_URL = os.environ.get("DISCORD_GENERAL_URL")
 DISCORD = Discord(url=DISCORD_URL)
-BED_SAYINGS = os.environ.get("BED_SAYINGS")
+BED_SAYINGS = json.loads(os.environ.get("BED_SAYINGS"))
 
 @lights_bp.route('/status', methods=['GET', 'POST'])
 def interact_smartthings():
@@ -121,6 +122,7 @@ def get_set_bedtime():
         db.session.add(new_bedtime)
         db.session.commit()
         if datetime.now() - timedelta(hours=24) < bedtime[0].time:
+            print(BED_SAYINGS[0])
             DISCORD.post(content=random.choice(BED_SAYINGS))
 
     # Loop through all the bedtime datapoints since yesterday (should only be 0-2) most recent first
