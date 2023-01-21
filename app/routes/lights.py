@@ -6,6 +6,7 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 from discordwebhook import Discord
+import random
 
 from app.models import Bedtime
 from .landscape import landscape
@@ -22,6 +23,7 @@ SMARTTHINGS_DEVICES_URL = 'https://api.smartthings.com/v1/devices'
 LIGHTING_STATES = {'on': True, 'off': False}
 DISCORD_URL = os.environ.get("DISCORD_GENERAL_URL")
 DISCORD = Discord(url=DISCORD_URL)
+BED_SAYINGS = os.environ.get("BED_SAYINGS")
 
 @lights_bp.route('/status', methods=['GET', 'POST'])
 def interact_smartthings():
@@ -93,6 +95,16 @@ def interact_smartthings():
 @lights_bp.route('/bedtime', methods=['GET', "POST"])
 def get_set_bedtime():
     """Returns the recent bedtime data. POST will also set bedtime"""
+    
+    # constants and instants
+    last_bedtime_time = "No Data"
+    today_bedtime_time = "No Data"
+    yesterday = datetime.now() - timedelta(hours=36)
+    recent = datetime.now() - timedelta(hours=8)
+
+    # Gather current data from the database back to yesterday, sorted by most recent
+    bedtime = Bedtime.query.filter(Bedtime.time>=yesterday).order_by(Bedtime.time.desc()).all()
+
     # If its a post request, we want to set the new bedtime FIRST
     if request.method == "POST":
         headers = {"Authorization": "Bearer " + SMARTTHINGS_TOKEN}
@@ -108,15 +120,9 @@ def get_set_bedtime():
         new_bedtime = Bedtime(time=datetime.now())
         db.session.add(new_bedtime)
         db.session.commit()
-        DISCORD.post(content=f"Good night!")
-    
-    # Go into database and get the last bedtime times in the last 36 hrs
-    last_bedtime_time = "No Data"
-    today_bedtime_time = "No Data"
-    yesterday = datetime.now() - timedelta(hours=36)
-    recent = datetime.now() - timedelta(hours=8)
-    # Get all data back to yesterday
-    bedtime = Bedtime.query.filter(Bedtime.time>=yesterday).order_by(Bedtime.time.desc()).all()
+        if datetime.now() - timedelta(hours=24) < bedtime[0].time:
+            DISCORD.post(content=random.choice(BED_SAYINGS))
+
     # Loop through all the bedtime datapoints since yesterday (should only be 0-2) most recent first
     for row in bedtime:
         # If the datapoint is within todays timeframe and todays timeframe has not yet been set
