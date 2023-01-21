@@ -122,7 +122,6 @@ def get_set_bedtime():
         db.session.add(new_bedtime)
         db.session.commit()
         if datetime.now() - timedelta(hours=24) < bedtime[0].time:
-            print(BED_SAYINGS[0])
             DISCORD.post(content=random.choice(BED_SAYINGS))
 
     # Loop through all the bedtime datapoints since yesterday (should only be 0-2) most recent first
