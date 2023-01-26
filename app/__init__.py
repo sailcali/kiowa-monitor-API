@@ -37,6 +37,7 @@ def create_app(test_config=None):
     from .routes.food import food_bp
     from .routes.weather import weather_bp
     from .routes.lights import lights_bp
+    from .routes.solar import solar_bp
 
     app.register_blueprint(climate_bp)
     app.register_blueprint(login_bp)
@@ -45,6 +46,7 @@ def create_app(test_config=None):
     app.register_blueprint(food_bp)
     app.register_blueprint(weather_bp)
     app.register_blueprint(lights_bp)
+    app.register_blueprint(solar_bp)
     
     return app
 

@@ -1,8 +1,7 @@
 
 from flask import Blueprint, jsonify, make_response, request, redirect, url_for
-import sqlalchemy
 from app import db
-from app.models import EnphaseProduction, LightingStatus, Food
+from app.models import LightingStatus, Food
 from datetime import datetime
 import requests
 from dotenv import load_dotenv
@@ -77,33 +76,6 @@ def food_tables():
     db.session.add(new_food)
     db.session.commit()
     return redirect(url_for('food_bp.get_food_schedule'))
-
-@api_bp.route('/solar-production/lifetime', methods=['GET'])
-def get_all_solar_production():
-    """Returns the total lifetime production value (sum) of the enphase system"""
-    all_production = db.session.query(sqlalchemy.func.sum(EnphaseProduction.production)).first()
-    return make_response({"total_production": all_production[0]}, 200)
-
-@api_bp.route('/solar-production/period-sum', methods=['GET'])
-def get_period_solar_production_sum():
-    """Returns the production sum for a period of time sent in the request body"""
-    request_body = request.get_json()
-    all_production = db.session.query(sqlalchemy.func.sum(EnphaseProduction.production)) \
-        .filter(sqlalchemy.and_(sqlalchemy.func.date(EnphaseProduction.time) >= request_body['start_date']), \
-        sqlalchemy.func.date(EnphaseProduction.time) <= request_body['end_date']).first()
-    return make_response({"period_production": all_production[0], "start_date": request_body['start_date'], "end_date": request_body['end_date']}, 200)
-
-@api_bp.route('/solar-production/period-data', methods=['GET'])
-def get_period_solar_production_data():
-    """Returns all production data for a period of time sent in the request body"""
-    request_body = request.get_json()
-    all_production = EnphaseProduction.query \
-        .filter(sqlalchemy.and_(sqlalchemy.func.date(EnphaseProduction.time) >= request_body['start_date']), \
-        sqlalchemy.func.date(EnphaseProduction.time) <= request_body['end_date']).all()
-    response_data = []
-    for row in all_production:
-        response_data.append({'time': row.time, 'production': row.production})
-    return make_response({'Results': response_data}, 200)
 
 @api_bp.route('/weather/outlook', methods=["GET"])
 def get_weather_outlook():
