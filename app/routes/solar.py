@@ -17,7 +17,8 @@ def get_set_daily_solar_production(requested_date):
     """Sets daily production values if POST, returns daily production values"""
     if request.method == "POST":
         data = request.get_json()
-        db.session.add_all(data['days_production'])
+        print(data)
+        db.session.bulk_insert_mappings(EnphaseProduction, data['days_production'])
         db.session.commit()
 
     start_date = datetime.strptime(requested_date, '%Y-%m-%d')
@@ -37,6 +38,7 @@ def get_set_solar_keys():
     client_password = request.headers.get("password")
     if client_password == API_PASSWORD:
         keys = request.get_json()
+        print(keys)
         if request.method == "POST":
             current_access = SDAccess.query.get(keys["user"])
             if current_access:
@@ -59,6 +61,11 @@ def get_set_solar_keys():
             data = {"rt":current_access.rt, "at": current_access.at, "date": current_access.rfdate}
             return make_response({'keys': data}, 200)
 
+@solar_bp.route('/production/last-update', methods=['GET'])
+def get_last_solar_production():
+    """Returns the date of the last production update"""
+    last_record = EnphaseProduction.query.order_by(EnphaseProduction.time.desc()).first()
+    return make_response({"last_entry": last_record.time}, 200)
 
 @solar_bp.route('/production/lifetime', methods=['GET'])
 def get_all_solar_production():
