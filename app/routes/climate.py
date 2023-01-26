@@ -1,7 +1,7 @@
 
-from flask import Blueprint, make_response, request, render_template, redirect, url_for, jsonify
+from flask import Blueprint, make_response, request, jsonify
 from app import db
-from app.models import LightingStatus, VenstarTemp, Bedtime
+from app.models import VenstarTemp
 from datetime import datetime, timedelta, date
 import requests
 from dotenv import load_dotenv
@@ -91,45 +91,59 @@ def interact_with_venstar():
         return jsonify([]), 201
 
 
-@climate_bp.route("/current_temps", methods=["GET"])
+@climate_bp.route("/current_temps", methods=["GET", "POST"])
 def return_current_temps_for_api():
     """Returns a JSON of the current temperatures onboard the server"""
-    
-    # Gather the last known temp data from database
-    last_temps = VenstarTemp.query.order_by(VenstarTemp.time.desc()).first()
-    
-    # Sensors wont work unless in PROD
-    if platform.system() == 'Linux':
-        i2c = board.I2C()
-        BME280 = adafruit_bme280.Adafruit_BME280_I2C(i2c, address=0x77)
-        farenheight = BME280.temperature * (9 / 5) + 32
-        humidity = BME280.humidity
-        pressure = round(BME280.pressure,1)
-    else:
-        # Not in PROD: use the last updated data
-        farenheight = last_temps.pi_temp
-        humidity = last_temps.humidity
-        pressure = round(last_temps.pressure,1)
-    
-    # Get the current venstar thermostat temperature and the outdoor temp.
-    venstar_response = requests.get(VENSTAR_SENSOR_URL)
-    venstar_info = venstar_response.json()
-    response = requests.get(GARAGE_PI_STATUS_URL)
-    garage_response = response.json()
-    try:
-        # Look for the Remote (outdoor) and Space Temp (thermostat) sensor temps
-        for sensor in venstar_info['sensors']:
-            if sensor['name'] == "Space Temp":
-                thermostat_temp = sensor["temp"]
-            if sensor['name'] == "Remote":
-                outdoor_temp = sensor['temp']
-    except KeyError:
-        # If VENSTAR request came back 404, use the last temps for the sensors
-        thermostat_temp = last_temps.local_temp
-        outdoor_temp = last_temps.remote_temp
+    if request.method == "GET":
+        # Gather the last known temp data from database
+        last_temps = VenstarTemp.query.order_by(VenstarTemp.time.desc()).first()
+        
+        # Sensors wont work unless in PROD
+        if platform.system() == 'Linux':
+            i2c = board.I2C()
+            BME280 = adafruit_bme280.Adafruit_BME280_I2C(i2c, address=0x77)
+            farenheight = BME280.temperature * (9 / 5) + 32
+            humidity = BME280.humidity
+            pressure = round(BME280.pressure,1)
+        else:
+            # Not in PROD: use the last updated data
+            farenheight = last_temps.pi_temp
+            humidity = last_temps.humidity
+            pressure = round(last_temps.pressure,1)
+        
+        # Get the current venstar thermostat temperature and the outdoor temp.
+        venstar_response = requests.get(VENSTAR_SENSOR_URL)
+        venstar_info = venstar_response.json()
+        response = requests.get(GARAGE_PI_STATUS_URL)
+        garage_response = response.json()
+        try:
+            # Look for the Remote (outdoor) and Space Temp (thermostat) sensor temps
+            for sensor in venstar_info['sensors']:
+                if sensor['name'] == "Space Temp":
+                    thermostat_temp = sensor["temp"]
+                if sensor['name'] == "Remote":
+                    outdoor_temp = sensor['temp']
+        except KeyError:
+            # If VENSTAR request came back 404, use the last temps for the sensors
+            thermostat_temp = last_temps.local_temp
+            outdoor_temp = last_temps.remote_temp
 
-    return jsonify({'pressure': pressure, 'thermostat': thermostat_temp, 'living_room': int(farenheight), 'living_room_humidity': int(humidity), 
-                    'outside': outdoor_temp, "garage": int(garage_response["temp"])}), 200
+        return jsonify({'pressure': pressure, 'thermostat': thermostat_temp, 'living_room': int(farenheight), 'living_room_humidity': int(humidity), 
+                        'outside': outdoor_temp, "garage": int(garage_response["temp"])}), 200
+    elif request.method == "POST":
+        # For a post of the current temps, we create a new object based on the param data, add, and commit it to the database
+        data = request.get_json()['data']
+        new_temps = VenstarTemp(time=data['time'],
+                                local_temp=data['local_temp'],
+                                remote_temp=data['remote_temp'],
+                                pi_temp=data['pi_temp'],
+                                humidity=data['humidity'],
+                                pressure=data['pressure'],
+                                heat_time=data['heat_time'],
+                                cool_time=data['cool_time'])
+        db.session.add(new_temps)
+        db.session.commit()
+        return make_response({"Status": "Created"}, 201)
 
 
 @climate_bp.route('/today', methods=['GET'])
