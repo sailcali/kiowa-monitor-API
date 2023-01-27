@@ -139,8 +139,8 @@ def return_current_temps_for_api():
                                 pi_temp=data['pi_temp'],
                                 humidity=data['humidity'],
                                 pressure=data['pressure'],
-                                heat_time=data['heat_time'],
-                                cool_time=data['cool_time'])
+                                heat_runtime=data['heat_runtime'],
+                                cool_runtime=data['cool_runtime'])
         db.session.add(new_temps)
         db.session.commit()
         return make_response({"Status": "Created"}, 201)
