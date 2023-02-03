@@ -51,7 +51,7 @@ def get_set_solar_keys():
         
         if request.method == "POST":
             # Check to see if the user code exists already
-            current_access = SDAccess.query.get(keys["user"])
+            current_access = SDAccess.query.filter(SDAccess.user == keys["user"]).first()
             if current_access:
                 # If so, we will adjust the existing tokens and commit
                 current_access.acdate = keys["date"]
@@ -72,7 +72,7 @@ def get_set_solar_keys():
             return make_response({"Result": "OK"}, 201)
         elif request.method == "GET":
             # For GET we will simply get the tokens for the specified user code and return it formatted
-            current_access = SDAccess.query.get(keys['user'])
+            current_access = SDAccess.query.filter(SDAccess.user == keys["user"]).first()
             data = {"rt":current_access.rt, "at": current_access.at, "date": current_access.rfdate}
             return make_response({'keys': data}, 200)
 

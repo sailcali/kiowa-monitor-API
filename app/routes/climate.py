@@ -220,7 +220,6 @@ def return_climate_data_from_date(requested_date):
                      "pressure": pressure})
     return make_response(data, 200)
 
-
 # DEPRECATED -----------------------------------------------------------------
 # @venstar_bp.route("/V1", methods=['GET'])
 # def kiowa_dashboard():
