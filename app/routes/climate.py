@@ -10,9 +10,13 @@ import platform
 from discordwebhook import Discord
 
 if platform.system() == 'Linux':
-    from adafruit_bme280 import basic as adafruit_bme280
-    from board import D4
-    import board
+    try:
+        from adafruit_bme280 import basic as adafruit_bme280
+        from board import D4
+        import board
+        GPIO = True
+    except ModuleNotFoundError:
+        GPIO = False
 
 climate_bp = Blueprint('climate_bp', __name__, url_prefix='/climate')
 
@@ -99,7 +103,7 @@ def return_current_temps_for_api():
         last_temps = VenstarTemp.query.order_by(VenstarTemp.time.desc()).first()
         
         # Sensors wont work unless in PROD
-        if platform.system() == 'Linux':
+        if GPIO:
             i2c = board.I2C()
             BME280 = adafruit_bme280.Adafruit_BME280_I2C(i2c, address=0x77)
             farenheight = BME280.temperature * (9 / 5) + 32
