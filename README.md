@@ -6,14 +6,26 @@ WARNING: NO SECURITY PROTOCOLS HAVE BEEN ADDED YET. THIS IS DESIGNED AT THIS POI
 
 FLASK Endpoints:
 
+GET /climate/venstar-status
+* Returns JSON of current VENSTAR settings and temps
+
+POST /climate/venstar-status
+* Changes VENSTAR thermostat state. Returns empty list
+
+GET /climate/current_temps
+* Returns JSON of current temps, pressure, humidity
+
+POST /climate/current_temps
+* Periodic posting of climate data to database (15 minutes)
+
+GET /climate/today
+* Returns todays climate data in JSON format data:list
+
+GET /climate/<YYYY-MM-DD>
+* Returns climate data in JSON format data:list for a specific date
+
 GET /api
 * Returns JSON of available API calls (not updated)
-
-GET /api/temps
-* returns the temperature data from today as JSON
-
-GET /api/current_temps
-* Returns current temperatures as JSON
 
 GET /api/garage-status
 * Returns garage PICO status (temperature and lighting) as JSON
@@ -24,41 +36,50 @@ POST /api/record-landscape-change
 POST /api/food
 * Records new food item in database for food tracker
 
-GET /api/smartthings/status
-* Returns SmartThings devices states as JSON
+GET /api/weather/outlook
+* Returns API data from openweathermap
 
-POST /api/smartthings/status
-* Changes lighting status. Requires 'light' with name of the light.
+GET /lighting/status
+* Returns JSON of lighting states from SMARTTHINGS and Garage PI
 
-GET /api/solar-production/lifetime
+POST /lighting/status
+* Change the state of lighting, return empty list
+
+GET /lighting/bedtime
+* Returns most recent bedtime data
+
+POST /lighting/bedtime
+* Turns off select lights and records time in database
+
+GET /solar/production/<YYYY-MM-DD>
+* Returns production data for a given date
+
+POST /solar/production/<YYYY-MM-DD>
+* Posts daily production data to database, returns the same
+
+GET /solar/access
+* Gets API keys for enphase access based on a user code. Requires API key.
+
+POST /solar/access
+* Sets API keys for enphase access into database. Requires API key.
+
+GET /solar/production/last-update
+* Returns the date of the last production update
+
+GET /solar/production/lifetime
 * Returns all known production data from database as JSON.
 
-GET /api/solar-production/period-sum
+GET solar/production/period-sum
 * Returns solar production data as a sum during a specified period. Requires 'start_date' and 'end_date' as YYYY-MM-DD.
 
-GET /api/solar-production/period/data
+GET /solar/production/period/data
 * Returns all known production data over a period from database as JSON. Requires 'start_date' and 'end_date' as YYYY-MM-DD.
 
-GET /venstar
-* Renders the main dashboard
-
-POST /venstar
-* Updates the VENSTAR status from dashboard entries and re-renders site
-
-GET /temps/<YYYY-MM-DD>
-* Renders a table of temperatures from a given date
-
-GET /temps/today
-* Renders a table of todays temperatures
-
-GET /usage/today
-* Renders a table of todays HVAC usage
-
 POST /landscape/change-state
-* Turns on/off landscape lighting (requires 'delay_time as minutes and 'state' as 0 or 1)
+* Turns on/off landscape lighting (requires 'state' as 0 or 1)
 
 GET /food/schedule
-* Renders food schedule site
+* Renders food schedule site (not yet react)
 
 POST /food/schedule
-* Records new food item in the schedule (or updates if one is currently in the slot) and re-renders
+* Records new food item in the schedule (or updates if one is currently in the slot) and re-renders (not yet react)

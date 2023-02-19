@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import os
 from dotenv import load_dotenv
+from flask_cors import CORS
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -10,8 +11,9 @@ load_dotenv()
 
 
 def create_app(test_config=None):
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder='build', static_url_path='/')
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    CORS(app)
     
     # if test_config is None:
     app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
@@ -28,24 +30,23 @@ def create_app(test_config=None):
     migrate.init_app(app, db)
     
     # Register Blueprints here
-    from .routes.temps import temps_bp
     from .routes.api import api_bp
-    from.routes.venstar import venstar_bp
+    from.routes.climate import climate_bp
     from .login_route import login_bp
-    from .routes.usage import usage_bp
     from .routes.landscape import landscape_bp
-    from .routes.api import api_bp
     from .routes.food import food_bp
     from .routes.weather import weather_bp
+    from .routes.lights import lights_bp
+    from .routes.solar import solar_bp
 
-    app.register_blueprint(temps_bp)
-    app.register_blueprint(venstar_bp)
+    app.register_blueprint(climate_bp)
     app.register_blueprint(login_bp)
-    app.register_blueprint(usage_bp)
     app.register_blueprint(landscape_bp)
     app.register_blueprint(api_bp)
     app.register_blueprint(food_bp)
     app.register_blueprint(weather_bp)
+    app.register_blueprint(lights_bp)
+    app.register_blueprint(solar_bp)
     
     return app
 

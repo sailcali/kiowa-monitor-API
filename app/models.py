@@ -10,6 +10,7 @@ class VenstarTemp(db.Model):
     pi_temp = db.Column(db.SmallInteger, nullable=True)
     heat_runtime = db.Column(db.SmallInteger)
     cool_runtime = db.Column(db.SmallInteger)
+    pressure = db.Column(db.Float)
 
 class EnphaseProduction(db.Model):
     __tablename__ = 'enphase_production'
@@ -47,3 +48,17 @@ class Bedtime(db.Model):
     __tablename__ = 'bedtime'
     id = db.Column(db.SmallInteger, primary_key=True, autoincrement=True)
     time = db.Column(db.DateTime)
+
+class DoorStatus(db.Model):
+    __tablename__ = 'door_status'
+    name = db.Column(db.String, primary_key=True)
+    state = db.Column(db.Boolean, nullable=False)
+    timestamp = db.Column(db.BigInteger)
+
+class SDAccess(db.Model):
+    __tablename__ = 'sd_access'
+    user = db.Column(db.String, primary_key=True)
+    at = db.Column(db.String)
+    rt = db.Column(db.Text)
+    acdate = db.Column(db.DateTime(timezone=True))
+    rfdate = db.Column(db.DateTime(timezone=True))
