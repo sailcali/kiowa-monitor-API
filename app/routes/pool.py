@@ -11,8 +11,8 @@ pool_bp = Blueprint('pool_bp', __name__, url_prefix='/pool')
 
 @pool_bp.route('/temp/set-temp', methods=['POST'])
 def set_pool_temp():
+    """Changes the set temperature on the solar valve controller"""
     body = request.get_json()
-
     params = {"setting": body["setting"]}
     response = requests.post(POOL_URL + "temp", params=params)
     if response.status_code == 200:
@@ -37,7 +37,7 @@ def open_pool_valve():
     try:
         params["delay"] = body['delay']
     except (TypeError, KeyError):
-        pass
+        params["delay"] = 60
     
     response = requests.post(POOL_URL + "valve", params=params)
     
@@ -57,7 +57,7 @@ def close_pool_valve():
     try:
         params["delay"] = body['delay']
     except (TypeError, KeyError):
-        pass
+        params["delay"] = 60
 
     response = requests.post(POOL_URL + "valve", params=params)
 
