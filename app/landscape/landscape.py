@@ -15,6 +15,7 @@ CRON_PERIOD = 6
 GARAGE_IP = os.environ.get("GARAGE_PI_IP")
 GARAGE_PI_STATUS_URL = 'http://' + GARAGE_IP + '/get-status'
 GARAGE_PI_LIGHTS_URL = 'http://' + GARAGE_IP + '/lights'
+AUTO_BEDTIME = os.environ.get("AUTO_BEDTIME")
 
 def change_landscape(on_off=3, delay_request=False):
     """Algorithm for deciding state of landscape lighting.
@@ -65,6 +66,9 @@ def change_landscape(on_off=3, delay_request=False):
             response = requests.get(GARAGE_PI_LIGHTS_URL + '/off')
             if response.json()['current_status']['landscape'] == 0:
                 state_change = False
+        
+        if AUTO_BEDTIME and datetime.now().hour == 0 and datetime.now().minute == 0:
+            r = requests.post('http://localhost/lighting/bedtime')
             
         # Update database with new state
         if state_change is not None:
