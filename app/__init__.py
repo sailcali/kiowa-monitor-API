@@ -53,7 +53,7 @@ def create_app(test_config=None):
     app.register_blueprint(solar_bp)
     app.register_blueprint(pool_bp)
 
-    @app.before_first_request
+    @app.before_request
     def check_user():
         ip = None
         

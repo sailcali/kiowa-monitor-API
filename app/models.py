@@ -62,3 +62,10 @@ class SDAccess(db.Model):
     rt = db.Column(db.Text)
     acdate = db.Column(db.DateTime(timezone=True))
     rfdate = db.Column(db.DateTime(timezone=True))
+
+class AllowedConnections(db.Model):
+    __tablename__ = "addresses"
+    id = db.Column(db.SmallInteger, primary_key=True, autoincrement=True)
+    address = db.Column(db.String, nullable=False)
+    timestamp = db.Column(db.BigInteger)
+    
