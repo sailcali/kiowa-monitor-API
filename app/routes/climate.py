@@ -4,7 +4,6 @@ from app import db
 from app.models import VenstarTemp
 from datetime import datetime, timedelta, date
 import requests
-from dotenv import load_dotenv
 import os
 import platform
 from discordwebhook import Discord
@@ -20,7 +19,6 @@ if platform.system() == 'Linux':
 
 climate_bp = Blueprint('climate_bp', __name__, url_prefix='/climate')
 
-load_dotenv()
 SMARTTHINGS_TOKEN = os.environ.get("SMARTTHINGS_TOKEN")
 VENSTAR_IP = os.environ.get("VENSTAR_IP")
 GARAGE_IP = os.environ.get("GARAGE_PI_IP")

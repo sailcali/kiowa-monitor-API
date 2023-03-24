@@ -1,10 +1,8 @@
 
-from flask import Blueprint, jsonify, make_response, request, abort, render_template, redirect, url_for
-import sqlalchemy
+from flask import Blueprint, request, render_template, redirect, url_for
 from app import db
 from app.models import FoodPlanner, MealListing, Food
 from datetime import date, datetime
-
 
 food_bp = Blueprint('food_bp', __name__, url_prefix='/food')
 

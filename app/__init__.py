@@ -5,9 +5,11 @@ import os
 from dotenv import load_dotenv
 from flask_cors import CORS
 from discordwebhook import Discord
+from datetime import datetime
 
 db = SQLAlchemy()
 migrate = Migrate()
+
 load_dotenv()
 
 DISCORD_URL = os.environ.get("DISCORD_GENERAL_URL")
@@ -27,7 +29,7 @@ def create_app(test_config=None):
     #         "SQLALCHEMY_TEST_DATABASE_URI")
     
     # Import models here for Alembic setup
-    from app.models import VenstarTemp, LightingStatus, EnphaseProduction, FoodPlanner, Food
+    from app.models import VenstarTemp, LightingStatus, EnphaseProduction, FoodPlanner, Food, AllowedConnections
     
     db.init_app(app)
     migrate.init_app(app, db)
@@ -55,15 +57,21 @@ def create_app(test_config=None):
 
     @app.before_request
     def check_user():
-        ip = None
+        """Run for each and every request - check user IP against database. If not in database - send IP to discord"""
         
+        ip = None
+
         if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
             ip = request.environ['REMOTE_ADDR']
         else:
             ip = request.environ['HTTP_X_FORWARDED_FOR']
-        
-        DISCORD.post(content=f"IP Address: {ip}")
-        
+
+        row = AllowedConnections.query.filter(AllowedConnections.address==ip).first()
+        if not row:
+            DISCORD.post(content=f"New access from IP Address: {ip}")
+            conn = AllowedConnections(address=ip, timestamp=int(datetime.now().timestamp()))
+            db.session.add(conn)
+            db.session.commit()
 
     return app
 

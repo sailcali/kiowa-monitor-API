@@ -1,9 +1,6 @@
 from flask import Blueprint, request, jsonify
 import requests
-from dotenv import load_dotenv
 import os
-
-load_dotenv()
 
 POOL_URL = os.environ.get("POOL_URL")
 
