@@ -1,14 +1,17 @@
-from flask import Flask
+from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import os
 from dotenv import load_dotenv
 from flask_cors import CORS
+from discordwebhook import Discord
 
 db = SQLAlchemy()
 migrate = Migrate()
 load_dotenv()
 
+DISCORD_URL = os.environ.get("DISCORD_GENERAL_URL")
+DISCORD = Discord(url=DISCORD_URL)
 
 def create_app(test_config=None):
     app = Flask(__name__, static_folder='build', static_url_path='/')
@@ -49,7 +52,19 @@ def create_app(test_config=None):
     app.register_blueprint(lights_bp)
     app.register_blueprint(solar_bp)
     app.register_blueprint(pool_bp)
-    
+
+    @app.before_first_request
+    def check_user():
+        ip = None
+        
+        if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
+            ip = request.environ['REMOTE_ADDR']
+        else:
+            ip = request.environ['HTTP_X_FORWARDED_FOR']
+        
+        DISCORD.post(content=f"IP Address: {ip}")
+        
+
     return app
 
 
