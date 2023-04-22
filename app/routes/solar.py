@@ -3,10 +3,7 @@ import sqlalchemy
 from app import db
 from app.models import EnphaseProduction, SDAccess
 from datetime import datetime, timedelta
-from dotenv import load_dotenv
 import os
-
-load_dotenv()
 
 API_PASSWORD = os.environ.get("API_PASSWORD")
 

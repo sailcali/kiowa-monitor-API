@@ -83,3 +83,15 @@ GET /food/schedule
 
 POST /food/schedule
 * Records new food item in the schedule (or updates if one is currently in the slot) and re-renders (not yet react)
+
+GET /pool
+* Simple connector to return the same details from the pool valve controller
+
+POST /pool/valve/open
+* Try to open the valve and return a status (allowed - delay: seconds{int} (default 60))
+
+POST /pool/valve/close
+* Try to close the valve and return a status (allowed - delay: seconds{int} (default 60))
+
+POST /pool/set-temp
+* Changes the set temperature on the solar valve controller (requires- setting: temp{int})

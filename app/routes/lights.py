@@ -4,7 +4,6 @@ from app import db
 import requests
 import os
 import json
-from dotenv import load_dotenv
 from datetime import datetime, timedelta
 from discordwebhook import Discord
 import random
@@ -14,8 +13,6 @@ from .landscape import landscape
 from smartthings import SMARTTHINGS_DEVICES, SMARTTHINGS_NAMES, LIGHTS_FE_TO_BE_CONVERSION, BEDTIME_LIGHTS
 
 lights_bp = Blueprint('lights_bp', __name__, url_prefix='/lighting')
-
-load_dotenv()
 
 SMARTTHINGS_TOKEN = os.environ.get("SMARTTHINGS_TOKEN")
 GARAGE_IP = os.environ.get("GARAGE_PI_IP")

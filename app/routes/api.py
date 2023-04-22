@@ -4,11 +4,8 @@ from app import db
 from app.models import LightingStatus, Food
 from datetime import datetime
 import requests
-from dotenv import load_dotenv
 import os
 from discordwebhook import Discord
-
-load_dotenv()
 
 GARAGE_PICO_URL = os.environ.get("GARAGE_PI_IP")
 WEATHER_APP_ID = os.environ.get("WEATHER_APP_ID")
