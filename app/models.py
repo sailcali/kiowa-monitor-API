@@ -68,4 +68,13 @@ class AllowedConnections(db.Model):
     id = db.Column(db.SmallInteger, primary_key=True, autoincrement=True)
     address = db.Column(db.String, nullable=False)
     timestamp = db.Column(db.BigInteger)
-    
+
+class PoolData(db.Model):
+    __tablename__ = "pooldata"
+    datetime = db.Column(db.DateTime(timezone=True))
+    roof_temp = db.Column(db.Float)
+    water_temp = db.Column(db.Float)
+    valve = db.Column(db.SmallInteger)
+    temp_range = db.Column(db.SmallInteger)
+    decline_hits = db.Column(db.SmallInteger)
+    max_hit_delay = db.Column(db.BigInteger)
