@@ -32,7 +32,7 @@ def get_set_pool_status():
     elif request.method == 'POST':
         body = request.get_json()['data']
 
-        new_pool_data = PoolData(time=datetime.now(tz=pytz.UTC),
+        new_pool_data = PoolData(datetime=datetime.now(tz=pytz.UTC),
                                     roof_temp=body['roof_temp'],
                                     water_temp=body['water_temp'],
                                     valve=body['valve'],
