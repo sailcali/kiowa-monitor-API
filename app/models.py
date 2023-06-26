@@ -71,7 +71,7 @@ class AllowedConnections(db.Model):
 
 class PoolData(db.Model):
     __tablename__ = "pooldata"
-    datetime = db.Column(db.DateTime(timezone=True))
+    datetime = db.Column(db.DateTime(timezone=True), primary_key=True)
     roof_temp = db.Column(db.Float)
     water_temp = db.Column(db.Float)
     valve = db.Column(db.SmallInteger)
