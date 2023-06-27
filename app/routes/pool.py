@@ -4,11 +4,12 @@ import os
 from app.models import PoolData
 from app import db
 import pytz
-from datetime import datetime
-
+from datetime import datetime, timedelta
+from app.pool_utils.pool import Pool
 POOL_URL = os.environ.get("POOL_URL")
 
 pool_bp = Blueprint('pool_bp', __name__, url_prefix='/pool')
+POOL = Pool()
 
 @pool_bp.route('/temp/set-temp', methods=['POST'])
 def set_pool_temp():
@@ -31,7 +32,11 @@ def get_set_pool_status():
         return jsonify(pool_json), 200
     elif request.method == 'POST':
         body = request.get_json()['data']
-
+        # Get pool temp for x minutes ago and evaluate whether or not to turn off the solar
+        start_datetime = datetime.now(tz=pytz.UTC) - timedelta(minutes=10)
+        temps = PoolData.query.filter(PoolData.datetime>start_datetime).first()
+        if temps:
+            POOL.evaluate_pool_temp(body['water_temp'], temps.water_temp)
         new_pool_data = PoolData(datetime=datetime.now(tz=pytz.UTC),
                                     roof_temp=body['roof_temp'],
                                     water_temp=body['water_temp'],
@@ -41,6 +46,7 @@ def get_set_pool_status():
                                     max_hit_delay=body['max_hit_delay'])
         db.session.add(new_pool_data)
         db.session.commit()
+
         return jsonify({"Status": "Created"}), 201
     
 @pool_bp.route('/valve/open', methods=['POST'])
@@ -54,11 +60,11 @@ def open_pool_valve():
     except (TypeError, KeyError):
         params["delay"] = 60
     
-    response = requests.post(POOL_URL + "valve", params=params)
+    result = POOL.close_valve(params)
     
-    if response.status_code == 200:
+    if result.status_code == 200:
         return jsonify({'status': 'opening'}), 201
-    elif response.status_code == 400:
+    elif result.status_code == 400:
         return jsonify({'status': 'open'})
     else:
         return jsonify({'status': "connectionError"})
@@ -73,12 +79,20 @@ def close_pool_valve():
         params["delay"] = body['delay']
     except (TypeError, KeyError):
         params["delay"] = 60
-
-    response = requests.post(POOL_URL + "valve", params=params)
-
-    if response.status_code == 200:
+    
+    result = POOL.close_valve(params)
+    
+    if result == 200:
         return jsonify({'status': 'closing'}), 201
-    elif response.status_code == 400:
+    elif result == 400:
         return jsonify({'status': 'closed'})
     else:
         return jsonify({'status': "connectionError"})
+
+@pool_bp.route('/config', methods=['POST'])
+def change_pool_config():
+    config = request.get_json()
+    if "MAX_DECLINE_HITS" in config:
+        POOL.max_decline_hits = config['MAX_DECLINE_HITS']
+    print(POOL.max_decline_hits)
+    return jsonify({"status":"changed"}), 201

@@ -1,5 +1,5 @@
 from flask import Blueprint, request, make_response
-from app.landscape import landscape
+from app.landscape_utils import landscape
 
 landscape_bp = Blueprint('landscape_bp', __name__, url_prefix='/landscape')
 
