@@ -10,7 +10,7 @@ DISCORD = Discord(url=DISCORD_POOL_URL)
 class Pool:
     def __init__(self):
         self.decline_hits = 0
-        self.max_decline_hits = MAX_DECLINE_HITS
+        self.max_decline_hits = int(MAX_DECLINE_HITS)
 
     def evaluate_pool_temp(self, current_temp, historical_temp):
         """Takes current temperature and historical pool temperature and evaluates whether or not to close the solar valve

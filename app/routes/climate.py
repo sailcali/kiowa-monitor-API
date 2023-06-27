@@ -42,8 +42,8 @@ def interact_with_venstar():
         venstar_modes = {0: 'OFF', 1: 'HEAT', 2: 'COOL', 3: 'AUTO'}
         # Change fan state to ON or AUTO
         fan_states = {0: 'AUTO', 1: 'ON'}
-        
         # First try to get VENSTAR data
+        therm_temp = None
         try:
             info_response = requests.get(VENSTAR_INFO_URL)
             info = info_response.json()
