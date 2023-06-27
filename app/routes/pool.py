@@ -42,7 +42,7 @@ def get_set_pool_status():
                                     water_temp=body['water_temp'],
                                     valve=body['valve'],
                                     temp_range=body['temp_range'],
-                                    decline_hits=0,
+                                    decline_hits=POOL.decline_hits,
                                     max_hit_delay=body['max_hit_delay'])
         db.session.add(new_pool_data)
         db.session.commit()
