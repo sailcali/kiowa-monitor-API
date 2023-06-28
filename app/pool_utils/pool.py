@@ -31,11 +31,11 @@ class Pool:
                 return True
         return False
     
-    def close_valve(self, params={"valve": 0, "delay": 0}):
+    def close_valve(self, params={"valve": 0}):
         response = requests.post(POOL_URL + "valve", params=params)
         return response.status_code
     
-    def open_valve(self, params={"valve": 0, "delay": 0}):
+    def open_valve(self, params={"valve": 1}):
         response = requests.post(POOL_URL + "valve", params=params)
         return response.status_code
     

@@ -44,10 +44,8 @@ def get_set_pool_status():
         last_status = PoolData.query.order_by(PoolData.datetime.desc()).first()
         if last_status.valve != body['valve']:
             if body['valve'] == 1:
-                DISCORD.post(content="Pool valve is open")
                 POOL.valve = True
             else:
-                DISCORD.post(content="Pool valve is closed")
                 POOL.valve = False
                 POOL.decline_hits = 0
         new_pool_data = PoolData(datetime=datetime.now(tz=pytz.UTC),
