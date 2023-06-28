@@ -6,7 +6,7 @@ from app import db
 import pytz
 from datetime import datetime, timedelta
 from app.pool_utils.pool import Pool
-import discordwebhook
+from discordwebhook import Discord
 
 POOL_URL = os.environ.get("POOL_URL")
 
