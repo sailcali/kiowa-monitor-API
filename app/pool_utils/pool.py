@@ -1,7 +1,7 @@
 from discordwebhook import Discord
 import requests
 import os
-from app.models import PoolData
+
 
 POOL_URL = os.environ.get("POOL_URL")
 MAX_DECLINE_HITS = os.environ.get("MAX_DECLINE_HITS")
@@ -9,16 +9,14 @@ DISCORD_POOL_URL = os.environ.get("DISCORD_POOL_URL")
 DISCORD = Discord(url=DISCORD_POOL_URL)
 
 class Pool:
-    def __init__(self):
+    def __init__(self, last_state=None):
         self.decline_hits = 0
         self.max_decline_hits = int(MAX_DECLINE_HITS)
         last_status = self.get_last_pool_status()
         self.valve = False
-        if last_status.valve == 1:
-            self.valve = True
-
-    def get_last_pool_status(self):
-        return PoolData.query.order_by(PoolData.datetime.desc()).first()
+        if last_state:
+            if last_status.valve == 1:
+                self.valve = True
 
     def evaluate_pool_temp(self, current_temp, historical_temp):
         """Takes current temperature and historical pool temperature and evaluates whether or not to close the solar valve

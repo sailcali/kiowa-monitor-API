@@ -11,7 +11,7 @@ from discordwebhook import Discord
 POOL_URL = os.environ.get("POOL_URL")
 
 pool_bp = Blueprint('pool_bp', __name__, url_prefix='/pool')
-POOL = Pool()
+POOL = Pool(last_state=PoolData.query.order_by(PoolData.datetime.desc()).first())
 DISCORD_POOL_URL = os.environ.get("DISCORD_POOL_URL")
 DISCORD = Discord(url=DISCORD_POOL_URL)
 
@@ -41,7 +41,7 @@ def get_set_pool_status():
         temps = PoolData.query.filter(PoolData.datetime>start_datetime).first()
         if temps and POOL.valve:
             POOL.evaluate_pool_temp(body['water_temp'], temps.water_temp)
-        last_status = POOL.get_last_pool_status()
+        last_status = PoolData.query.order_by(PoolData.datetime.desc()).first()
         if last_status.valve != body['valve']:
             if body['valve'] == 1:
                 DISCORD.post(content="Pool valve is open")
