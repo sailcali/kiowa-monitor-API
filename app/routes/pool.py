@@ -6,10 +6,14 @@ from app import db
 import pytz
 from datetime import datetime, timedelta
 from app.pool_utils.pool import Pool
+import discordwebhook
+
 POOL_URL = os.environ.get("POOL_URL")
 
 pool_bp = Blueprint('pool_bp', __name__, url_prefix='/pool')
 POOL = Pool()
+DISCORD_POOL_URL = os.environ.get("DISCORD_POOL_URL")
+DISCORD = Discord(url=DISCORD_POOL_URL)
 
 @pool_bp.route('/temp/set-temp', methods=['POST'])
 def set_pool_temp():
@@ -35,8 +39,17 @@ def get_set_pool_status():
         # Get pool temp for x minutes ago and evaluate whether or not to turn off the solar
         start_datetime = datetime.now(tz=pytz.UTC) - timedelta(minutes=10)
         temps = PoolData.query.filter(PoolData.datetime>start_datetime).first()
-        if temps:
+        if temps and POOL.valve:
             POOL.evaluate_pool_temp(body['water_temp'], temps.water_temp)
+        last_status = POOL.get_last_pool_status()
+        if last_status.valve != body['valve']:
+            if body['valve'] == 1:
+                DISCORD.post(content="Pool valve is open")
+                POOL.valve = True
+            else:
+                DISCORD.post(content="Pool valve is closed")
+                POOL.valve = False
+                POOL.decline_hits = 0
         new_pool_data = PoolData(datetime=datetime.now(tz=pytz.UTC),
                                     roof_temp=body['roof_temp'],
                                     water_temp=body['water_temp'],
