@@ -109,3 +109,9 @@ def change_pool_config():
         POOL.max_decline_hits = config['MAX_DECLINE_HITS']
     print(POOL.max_decline_hits)
     return jsonify({"status":"changed"}), 201
+
+@pool_bp.route('/notification', methods=['POST'])
+def post_notification_to_discord():
+    body = request.get_json()
+    DISCORD.post(content=body['message'])
+    return jsonify({"Status":"Message Sent"}), 201
