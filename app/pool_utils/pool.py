@@ -18,7 +18,6 @@ class Pool:
 
         if historical_temp > current_temp:
             self.decline_hits += 1
-            print("test")
         else:
             if self.decline_hits > 0:
                 self.decline_hits -= 1

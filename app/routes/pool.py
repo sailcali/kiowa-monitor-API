@@ -62,9 +62,9 @@ def open_pool_valve():
     
     result = POOL.close_valve(params)
     
-    if result.status_code == 200:
+    if result == 200:
         return jsonify({'status': 'opening'}), 201
-    elif result.status_code == 400:
+    elif result == 400:
         return jsonify({'status': 'open'})
     else:
         return jsonify({'status': "connectionError"})
