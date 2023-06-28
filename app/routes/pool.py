@@ -11,7 +11,7 @@ from discordwebhook import Discord
 POOL_URL = os.environ.get("POOL_URL")
 
 pool_bp = Blueprint('pool_bp', __name__, url_prefix='/pool')
-POOL = Pool(last_state=PoolData.query.order_by(PoolData.datetime.desc()).first())
+POOL = Pool()
 DISCORD_POOL_URL = os.environ.get("DISCORD_POOL_URL")
 DISCORD = Discord(url=DISCORD_POOL_URL)
 
