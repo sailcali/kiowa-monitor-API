@@ -8,14 +8,18 @@ from datetime import datetime, timedelta
 import requests
 from dotenv import load_dotenv
 import os
+from discordwebhook import Discord
 
 load_dotenv()
 
 CRON_PERIOD = 6
 GARAGE_IP = os.environ.get("GARAGE_PI_IP")
+POOL_URL = os.environ.get("POOL_URL")
 GARAGE_PI_STATUS_URL = 'http://' + GARAGE_IP + '/get-status'
 GARAGE_PI_LIGHTS_URL = 'http://' + GARAGE_IP + '/lights'
 AUTO_BEDTIME = os.environ.get("AUTO_BEDTIME").lower() in ['true', 'yes', 'y']
+DISCORD_URL = os.environ.get("DISCORD_POOL_URL")
+DISCORD = Discord(url=DISCORD_URL)
 
 def change_landscape(on_off=3, delay_request=False):
     """Algorithm for deciding state of landscape lighting.
@@ -79,5 +83,13 @@ def change_landscape(on_off=3, delay_request=False):
                 r = requests.post('http://localhost:5000/api/record-landscape-change', json={'state_change': state_change})
     return state_change
     
+def check_pool():
+    response = requests.get(POOL_URL + "/sanity-check")
+    json = response.get_json()
+    if "status" not in json or json['status'] != "Running SAT":
+        DISCORD.post(content="Pool connection lost!")
+        
 if __name__ == '__main__':
     change_landscape()
+
+    check_pool()
