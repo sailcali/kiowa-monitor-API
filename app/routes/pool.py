@@ -29,25 +29,32 @@ def set_pool_temp():
 @pool_bp.route('/status', methods=['GET', 'POST'])
 def get_set_pool_status():
     """Get or set the current pool controller values"""
+    
+    # Before anything we update the pump state
+    POOL.check_pool_pump_state()
+    
     if request.method == 'GET':
         response = requests.get(POOL_URL + "status")
         pool_json =  response.json()
-
+        pool_json['pump_running'] = POOL.pump_running
         return jsonify(pool_json), 200
     elif request.method == 'POST':
         body = request.get_json()['data']
+        
         # Get pool temp for x minutes ago and evaluate whether or not to turn off the solar
         start_datetime = datetime.now(tz=pytz.UTC) - timedelta(minutes=10)
         temps = PoolData.query.filter(PoolData.datetime>start_datetime).first()
-        if temps and POOL.valve:
-            POOL.evaluate_pool_temp(body['water_temp'], temps.water_temp)
         last_status = PoolData.query.order_by(PoolData.datetime.desc()).first()
+        
+        # First check and see if the valve closed - we need to reset decline hits
         if last_status.valve != body['valve']:
-            if body['valve'] == 1:
-                POOL.valve = True
-            else:
-                POOL.valve = False
+            if body['valve'] == 0:
                 POOL.decline_hits = 0
+
+        # If the valve is open (and we have 10 mins of data, and pump running then we evaluate for decline hits
+        if temps and body['valve'] == 1 and POOL.pump_running:
+            POOL.evaluate_pool_temp(body['water_temp'], temps.water_temp)
+        
         new_pool_data = PoolData(datetime=datetime.now(tz=pytz.UTC),
                                     roof_temp=body['roof_temp'],
                                     water_temp=body['water_temp'],
