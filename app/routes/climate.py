@@ -56,6 +56,7 @@ def interact_with_venstar():
             DISCORD.post(content=f"Problem with Venstar. Error: {e}")
         else:
             # No errors: Set remote temperature (outdoor)
+            remote_temp = 0
             for sensor in sensors['sensors']:
                 if sensor['name'] == 'Remote':
                     remote_temp = int(sensor['temp'])
@@ -118,6 +119,7 @@ def return_current_temps_for_api():
         venstar_info = venstar_response.json()
         response = requests.get(GARAGE_PI_STATUS_URL)
         garage_response = response.json()
+        outdoor_temp = 0
         try:
             # Look for the Remote (outdoor) and Space Temp (thermostat) sensor temps
             for sensor in venstar_info['sensors']:
@@ -128,7 +130,7 @@ def return_current_temps_for_api():
         except KeyError:
             # If VENSTAR request came back 404, use the last temps for the sensors
             thermostat_temp = last_temps.local_temp
-            outdoor_temp = last_temps.remote_temp
+            #outdoor_temp = last_temps.remote_temp
 
         return jsonify({'pressure': pressure, 'thermostat': thermostat_temp, 'living_room': int(farenheight), 'living_room_humidity': int(humidity), 
                         'outside': outdoor_temp, "garage": int(garage_response["temp"])}), 200
