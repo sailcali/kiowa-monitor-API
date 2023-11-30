@@ -1,0 +1,272 @@
+nav ul {
+    list-style-type: none;
+    margin: 30px;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+  }
+  
+nav li {
+    float: left;
+  }
+  
+nav li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+  }
+  
+nav li a:hover {
+    background-color: #111;
+  }
+
+main {
+    display: flex;
+    flex-flow: row wrap;
+}
+
+/* Each container in the main */
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-left: 20px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  margin-right: 20px;    
+  background-color: aqua;
+  border-radius: 30px;
+}
+
+#thermostatContainer {
+    height: 450px;
+    width: 300px;
+}
+
+#thermostatContainer div {
+  display: flex;
+  justify-content: center;
+  align-items: space-around;
+  margin: 0px 30px;
+}
+
+#heattemp {
+  align-items: center;
+  margin-right: 20px;
+  margin-left: 20px;
+}
+#cooltemp {
+  align-items: center;
+  margin-right: 20px;
+  margin-left: 20px;
+}
+
+.roundButton {
+  background-color: #04AA6D;
+  border: none;
+  color: white;
+  text-decoration: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  margin: 4px 2px;
+  border-radius: 50%;
+}
+
+.winter {
+  display: none;
+}
+
+.summer {
+  display: none;
+}
+#temperatureContainer {
+  height: 350px;
+  width: 300px;
+  align-items: center;
+}
+
+/* #usageContainer {
+height: 150px;
+width: 300px;
+align-items: center;
+} */
+
+/* #lightingContainer {
+  height: 600px;
+  width: 300px;
+  align-items: center;
+  }
+
+#landscapeDelaySelector {
+  display: flex;
+  flex-direction: row;
+}
+
+#landscapeDelaySetTime {
+  display: none;
+} */
+#allLightsContainer {
+  display: flex;
+  flex-direction: row;
+}
+.lightingContainer {
+  width: 120px;
+  align-items: center;
+  text-align: center;
+}
+#smartThingsContainer {
+  height: 420px;
+  width: 420px;
+  align-items: center;
+}
+
+#bedtimeContainer {
+  height: 300px;
+  width: 300px;
+  align-items: center;
+}
+
+#bedtimeContainer div {
+  text-align: center;
+}
+
+#bedtimeContainer h1 {
+  margin-bottom: 20px;
+}
+
+main input {
+  width: 50px;
+  padding: 10px 10px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+#tempSubmit {
+  background-color:rgb(8, 2, 61);
+  color: white;
+  margin-top: 15px;
+  width: 200px;
+}
+
+/*                                                  Dropdown Buttons                          */
+.dropbtn {
+    background-color: #04AA6D;
+    color: white;
+    padding: 16px;
+    font-size: 16px;
+    border: none;
+  }
+  
+  /* Dropdown Content (Hidden by Default) */
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+  }
+  
+  /* Links inside the dropdown */
+  .dropdown-content input {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+  }
+  
+  /* Change color of dropdown links on hover */
+  .dropdown-content a:hover {background-color: #ddd;}
+  
+  /* Show the dropdown menu on hover */
+  .dropdown:hover .dropdown-content {display: block;}
+  
+  /* Change the background color of the dropdown button when the dropdown content is shown */
+  .dropdown:hover .dropbtn {background-color: #3e8e41;}
+
+  #dateButtonTemp {
+      color: black;
+      font-weight: bold;
+      background-color: grey;
+  }
+
+/* STILL NEED TO DO THIS */
+  /* #dateButtonUsage {
+    color: black;
+    font-weight: bold;
+    background-color: grey;
+  } */
+
+
+  /*  = THIS IS FOR THE LIGHTING SELECTOR SWITCH                  */
+/* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+  margin: 10px 10px 10px 10px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.crossedOutLabel {
+  text-decoration: line-through;
+}

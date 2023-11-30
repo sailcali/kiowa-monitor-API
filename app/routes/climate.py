@@ -7,6 +7,7 @@ import requests
 import os
 import platform
 from discordwebhook import Discord
+from .weather import return_current_local_weather
 
 if platform.system() == 'Linux':
     try:
@@ -36,6 +37,7 @@ DISCORD = Discord(url=DISCORD_URL)
 @climate_bp.route("/venstar-status", methods=["GET", "POST"])
 def interact_with_venstar():
     """Get the current status of venstar ecosystem, Change the current status of venstar ecosystem"""
+    weather = return_current_local_weather()
     if request.method == 'GET':
         # Transfer Values
         # Change mode data (0,1,2,3) to understandable strings
@@ -47,8 +49,6 @@ def interact_with_venstar():
         try:
             info_response = requests.get(VENSTAR_INFO_URL)
             info = info_response.json()
-            sensor_response = requests.get(VENSTAR_SENSOR_URL)
-            sensors = sensor_response.json()
             runtime_response = requests.get(VENSTAR_RUNTIMES_URL)
             runtimes = runtime_response.json()
         except requests.exceptions.RequestException as e:
@@ -56,10 +56,10 @@ def interact_with_venstar():
             DISCORD.post(content=f"Problem with Venstar. Error: {e}")
         else:
             # No errors: Set remote temperature (outdoor)
-            remote_temp = 0
-            for sensor in sensors['sensors']:
-                if sensor['name'] == 'Remote':
-                    remote_temp = int(sensor['temp'])
+            remote_temp = int(weather['main']['temp'])
+            # for sensor in sensors['sensors']:
+            #     if sensor['name'] == 'Remote':
+            #         remote_temp = int(sensor['temp'])
 
             # Collect and transpose real-time data
             heat_time = runtimes['runtimes'][-1]['heat1']
@@ -98,6 +98,8 @@ def interact_with_venstar():
 def return_current_temps_for_api():
     """Returns a JSON of the current temperatures onboard the server"""
     if request.method == "GET":
+        weather = return_current_local_weather()
+        outdoor_temp = int(weather['main']['temp'])
         # Gather the last known temp data from database
         last_temps = VenstarTemp.query.order_by(VenstarTemp.time.desc()).first()
         
@@ -119,14 +121,14 @@ def return_current_temps_for_api():
         venstar_info = venstar_response.json()
         response = requests.get(GARAGE_PI_STATUS_URL)
         garage_response = response.json()
-        outdoor_temp = 0
+
         try:
             # Look for the Remote (outdoor) and Space Temp (thermostat) sensor temps
             for sensor in venstar_info['sensors']:
                 if sensor['name'] == "Space Temp":
                     thermostat_temp = sensor["temp"]
-                if sensor['name'] == "Remote":
-                    outdoor_temp = sensor['temp']
+                # if sensor['name'] == "Remote":
+                #     outdoor_temp = sensor['temp']
         except KeyError:
             # If VENSTAR request came back 404, use the last temps for the sensors
             thermostat_temp = last_temps.local_temp
