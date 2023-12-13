@@ -31,7 +31,7 @@ def change_landscape(on_off=3, delay_request=False):
     
     # This will track if the lights are actually changed or not
     state_change = None
-
+    
     # Get time of sunrise and sunset
     city = lookup("San Diego", database())
     s = sun(city.observer, date=date.today())
@@ -39,7 +39,7 @@ def change_landscape(on_off=3, delay_request=False):
     sunset_over = sunset + timedelta(minutes=CRON_PERIOD)
     sunset = sunset.astimezone(tz=pytz.timezone("US/Pacific"))
     sunset_over = sunset_over.astimezone(tz=pytz.timezone("US/Pacific"))
-
+    
     # Get the current settings from PICO
     response = requests.get(GARAGE_PI_STATUS_URL)
     if response.status_code != 404:
@@ -84,8 +84,11 @@ def change_landscape(on_off=3, delay_request=False):
     return state_change
     
 def check_pool():
-    response = requests.get(POOL_URL + "/sanity-check")
-    json = response.get_json()
+    response = requests.get(POOL_URL + "sanity-check")
+    try:
+        json = response.json()
+    except Exception:
+        DISCORD.post(content="Pool connection lost!")
     if "status" not in json or json['status'] != "Running SAT":
         DISCORD.post(content="Pool connection lost!")
         
