@@ -19,9 +19,8 @@ DISCORD = Discord(url=DISCORD_POOL_URL)
 def set_pool_temp():
     """Changes the set temperature on the solar valve controller"""
     body = request.get_json()
-    params = {"setting": body["setting"]}
-    response = requests.post(POOL_URL + "temp", params=params)
-    if response.status_code == 200:
+    response = requests.post(POOL_URL + "temp", json=body)
+    if response.status_code == 201:
         return jsonify({"status": f"New set temp {body['setting']} deg"}), 201
     else:
         return jsonify({"status": "connectionError"}), 400
@@ -34,8 +33,8 @@ def get_set_pool_status():
     POOL.check_pool_pump_state()
     
     if request.method == 'GET':
-        response = requests.get(POOL_URL + "status")
-        pool_json =  response.json()
+        response = requests.get(POOL_URL)
+        pool_json =  response.json()['data']
         pool_json['pump_running'] = POOL.pump_running
         return jsonify(pool_json), 200
     elif request.method == 'POST':
@@ -71,16 +70,16 @@ def get_set_pool_status():
 def open_pool_valve():
     """Try to open the valve and return a status"""
     body = request.get_json()
-    params = {"valve": 1}
+    params = {"valve": True}
 
     try:
         params["delay"] = body['delay']
     except (TypeError, KeyError):
-        params["delay"] = 60
+        pass
     
-    result = POOL.close_valve(params)
-    
-    if result == 200:
+    result = POOL.open_valve(params)
+    print(result)
+    if result == 201:
         return jsonify({'status': 'opening'}), 201
     elif result == 400:
         return jsonify({'status': 'open'})
@@ -91,16 +90,16 @@ def open_pool_valve():
 def close_pool_valve():
     """Try to close the valve and return a status"""
     body = request.get_json()
-    params = {"valve": 0}
+    params = {"valve": False}
 
     try:
         params["delay"] = body['delay']
     except (TypeError, KeyError):
-        params["delay"] = 60
+        pass
     
     result = POOL.close_valve(params)
-    
-    if result == 200:
+    print(result)
+    if result == 201:
         return jsonify({'status': 'closing'}), 201
     elif result == 400:
         return jsonify({'status': 'closed'})

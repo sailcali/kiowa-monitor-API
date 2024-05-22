@@ -15,6 +15,7 @@ class Pool:
         self.pump_running = True
         self.pump_start_time = int(os.environ.get("POOL_PUMP_START_TIME"))
         self.pump_end_time =int(os.environ.get("POOL_PUMP_END_TIME"))
+        self.check_pool_pump_state()
 
     def check_pool_pump_state(self):
         current_datetime = datetime.now(tz=pytz.UTC)
@@ -41,11 +42,11 @@ class Pool:
                 return True
         return False
     
-    def close_valve(self, params={"valve": 0}):
-        response = requests.post(POOL_URL + "valve", params=params)
+    def close_valve(self, params={"valve": False}):
+        response = requests.post(POOL_URL + "valve", json=params)
         return response.status_code
     
-    def open_valve(self, params={"valve": 1}):
-        response = requests.post(POOL_URL + "valve", params=params)
+    def open_valve(self, params={"valve": True}):
+        response = requests.post(POOL_URL + "valve", json=params)
         return response.status_code
     
