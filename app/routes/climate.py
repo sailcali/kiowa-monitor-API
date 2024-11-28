@@ -119,8 +119,8 @@ def return_current_temps_for_api():
         # Get the current venstar thermostat temperature and the outdoor temp.
         venstar_response = requests.get(VENSTAR_SENSOR_URL)
         venstar_info = venstar_response.json()
-        response = requests.get(GARAGE_PI_STATUS_URL)
-        garage_response = response.json()
+        #response = requests.get(GARAGE_PI_STATUS_URL)
+        #garage_response = response.json()
 
         try:
             # Look for the Remote (outdoor) and Space Temp (thermostat) sensor temps
@@ -135,7 +135,7 @@ def return_current_temps_for_api():
             #outdoor_temp = last_temps.remote_temp
 
         return jsonify({'pressure': pressure, 'thermostat': thermostat_temp, 'living_room': int(farenheight), 'living_room_humidity': int(humidity), 
-                        'outside': outdoor_temp, "garage": int(garage_response["temp"])}), 200
+                        'outside': outdoor_temp}), 200
     elif request.method == "POST":
         # For a post of the current temps, we create a new object based on the param data, add, and commit it to the database
         data = request.get_json()['data']

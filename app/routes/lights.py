@@ -34,8 +34,8 @@ def interact_smartthings():
         states = {"devices": {}}
 
         # First, the landscape light status from the garage PICO
-        result = requests.get(GARAGE_PI_STATUS_URL)
-        garage_response = result.json()
+        #result = requests.get(GARAGE_PI_STATUS_URL)
+        # garage_response = result.json()
 
         # Next, loop through each SmartThings light device and put its status into a dictionary (if available)
         for device, id in SMARTTHINGS_DEVICES.items():
@@ -56,10 +56,10 @@ def interact_smartthings():
                     # Otherwise, report the status (true or false)
                     states['devices'][SMARTTHINGS_NAMES[device]] = LIGHTING_STATES[device_state['components']['main']['switch']['switch']['value']]
         # Based on response from the garage, set the landscape lighting status
-        if garage_response['current_status']['landscape'] == 1:
-            states['devices']["landscape"] = True
-        else:
-            states['devices']["landscape"] = False
+        # if garage_response['current_status']['landscape'] == 1:
+        #     states['devices']["landscape"] = True
+        # else:
+        #     states['devices']["landscape"] = False
         return jsonify(states)
 
     if request.method == 'POST':
